@@ -33,7 +33,7 @@
                  <template v-else> 
                     <i class="el-icon-delate_success"></i>
                     <span  class="Processing_delate_success">
-                       当前成功处理文件{{delatedNum}}个<template v-if="!isFree">，已消耗{{delated_blance}}额度，剩余{{balance_total-delated_blance}}额度，<a href="http://vip.foxitreader.cn/pdf365/pdf365_pay" target="_blank" >立即充值</a></template>
+                       当前成功处理文件{{delatedNum}}个<template v-if="!isFree">，已消耗{{delated_blance}}额度，剩余<template v-if="balance_total_Blance !=0">{{balance_total_Blance}}</template><template v-else-if="(balance_total-delated_blance)<0||(balance_total-delated_blance)==0">0</template><template v-else>{{balance_total-delated_blance}}</template>额度，<a href="http://vip.foxitreader.cn/pdf365/pdf365_pay" target="_blank" >立即充值</a></template>
                     </span> 
                  </template> 
              </template>
@@ -73,24 +73,38 @@
                           <span>{{item.noServeMessage}}</span>
                   </template>
                   <template v-else> 
-                    <div style="display: inline-block;margin-top:18px">
-                      <m-progress :widths="'198px'" :endPro='90'></m-progress>
-                    </div>
+                    <div style="display: inline-block;margin-top:18px;margin-right:12px;">
+                      <m-progress :widths="'110px'" :endPro='90'></m-progress> 
+                    </div> 
+                    <template v-if="!isDelates">
+                      正在上传
+                    </template>
                   </template>
                 </template>
                 <template v-else>
                     <template v-if="item.index_u==4">
-                    <span class="message_states_Ones">{{sizeChange(item["_prevUploadedSize"])}}</span>
-                    <span ><template  v-if="!isFree">{{item.price}}额度</template></span> 
+                      <template  v-if="item.url_d !='NoBalance'"> 
+                        <span class="message_states_Ones">{{sizeChange(item["_prevUploadedSize"])}}</span>
+                        <span ><template  v-if="!isFree">{{item.price}}额度</template></span> 
+                      </template>
+                      <template v-else>
+                              <span class="NoBlanceS">额度不足，<span><a href="javascript:;" @click="noBlaceBtn(index,item.docid,item.jobId_d)">请重试</a></span>或<span><a href="http://vip.foxitreader.cn/pdf365/pdf365_pay" target="_blank">前往充值</a></span></span> 
+                      </template>
                     </template>
                     <template v-else-if="item.index_u==1">
-                      <span>{{item.message_y}}</span>
+                      <span class="error">{{item.message_y}}<template ><a href="https://www.pdf365.cn/pdf-unlock" target="_blank">{{item.message_y3}}</a></template></span>
+                      <span v-if="item.message_y2">{{item.message_y2}}</span>
                     </template> 
                     <template v-else> 
                       <template v-if="item.price">
-                        <div style="display: inline-block;margin-top:18px">
-                          <m-progress :widths="'198px'" :endPro='90'></m-progress>
-                        </div>
+                        <div style="display: inline-block;margin-top:18px;margin-right:12px;">
+                          <m-progress :widths="'110px'" :endPro='90'></m-progress>
+                        </div> 
+                        <template v-if="isDelates">
+                            <template v-if="delateing">
+                              正在处理 
+                            </template> 
+                        </template>
                       </template>
                       <template v-else>
                           <template v-if="item.noWeb">
@@ -123,7 +137,12 @@
                 </template>
                 <template v-else> 
                     <template v-if="item.index_u==4">
-                      <span><a :href="item.url_d" >下载</a></span>
+                          <template  v-if="item.url_d!='NoBalance'"> 
+                         <span><a :href="item.url_d" >下载</a></span>
+                      </template>
+                      <template v-else>
+                         <span><a   href="JavaScript:;" @click="delates(index,'删除')">删除</a></span>
+                      </template>  
                     </template>
                     <template v-else-if="item.index_u==1">
                       <!-- <span  @click="delates(index,'删除')" class="delates" >删除</span> -->
@@ -378,7 +397,7 @@ export default {
   name: "addWater_list",
   data() {
     return {
-      NoFileList: false, //加水印功能页面的内容展示
+      NoFileList: true, //加水印功能页面的内容展示
       changesOver: true, //水印内容可编辑
       isLogings: false, //是否登录
 
@@ -386,7 +405,7 @@ export default {
       delateing: true, //开始处理中   处理完成 false
       delatedNum: 0, //  处理成功的文件
       index_u_status: true, //true  上传状态    false 处理状态
-      //模拟数据
+      //模拟数据 上传
       molis: [
         {
           isFolder: false,
@@ -402,15 +421,10 @@ export default {
           aborted: false,
           averageSpeed: 0,
           currentSpeed: 0,
-          _lastProgressCallback: 1541267023815,
-          _prevUploadedSize: 14887,
-          _prevProgress: 1,
-          uniqueIdentifier: "14887-001M-pdf",
-          status: "success",
-          _progeressId: 0,
-          price: 1,
-          docid: "dc9c3eca-3903-4dc2-ae0a-3d0d048886b2",
-          singleComplete: true
+          _lastProgressCallback: 1542014688190,
+          _prevUploadedSize: 0,
+          _prevProgress: 0,
+          uniqueIdentifier: "14887-001M-pdf"
         },
         {
           isFolder: false,
@@ -426,15 +440,10 @@ export default {
           aborted: false,
           averageSpeed: 0,
           currentSpeed: 0,
-          _lastProgressCallback: 1541267023689,
-          _prevUploadedSize: 14887,
-          _prevProgress: 1,
-          uniqueIdentifier: "14887-001Mpdf",
-          status: "success",
-          _progeressId: 0,
-          price: 1,
-          docid: "b063d463-eb5d-49f0-b3f8-69a272043921",
-          singleComplete: true
+          _lastProgressCallback: 1542014688199,
+          _prevUploadedSize: 0,
+          _prevProgress: 0,
+          uniqueIdentifier: "14887-001Mpdf"
         },
         {
           isFolder: false,
@@ -450,15 +459,10 @@ export default {
           aborted: false,
           averageSpeed: 0,
           currentSpeed: 0,
-          _lastProgressCallback: 1541267028420,
-          _prevUploadedSize: 2096160,
-          _prevProgress: 1,
-          uniqueIdentifier: "2096160-20M-1pdf",
-          status: "success",
-          _progeressId: 0,
-          price: 1,
-          docid: "4d251c21-e9f5-453e-94f4-6d638222bb55",
-          singleComplete: true
+          _lastProgressCallback: 1542014688207,
+          _prevUploadedSize: 0,
+          _prevProgress: 0,
+          uniqueIdentifier: "2096160-20M-1pdf"
         },
         {
           isFolder: false,
@@ -474,34 +478,97 @@ export default {
           aborted: false,
           averageSpeed: 0,
           currentSpeed: 0,
-          _lastProgressCallback: 1541267028600,
-          _prevUploadedSize: 2096160,
-          _prevProgress: 1,
-          uniqueIdentifier: "2096160-20Mpdf",
-          status: "success",
-          _progeressId: 0,
-          price: 1,
-          docid: "8f22f0db-3698-459d-bc00-793952bff59c",
-          singleComplete: true
-        },
+          _lastProgressCallback: 1542014688215,
+          _prevUploadedSize: 0,
+          _prevProgress: 0,
+          uniqueIdentifier: "2096160-20Mpdf"
+        }
+      ],
+      //模拟数据 处理完成
+      MOlists: [
         {
           isFolder: false,
           isRoot: false,
-          id: 6,
+          id: 2,
           fileType: "application/pdf",
-          name: "4.01M(3).pdf",
-          size: 4205814,
-          relativePath: "4.01M(3).pdf",
+          name: "0.01M - 副本.pdf",
+          size: 14887,
+          relativePath: "0.01M - 副本.pdf",
           paused: false,
           error: false,
           allError: false,
           aborted: false,
           averageSpeed: 0,
           currentSpeed: 0,
-          _lastProgressCallback: 1541267046080,
-          _prevUploadedSize: 0,
-          _prevProgress: 0,
-          uniqueIdentifier: "4205814-401M3pdf"
+          _lastProgressCallback: 1541992767596,
+          _prevUploadedSize: 14887,
+          _prevProgress: 1,
+          uniqueIdentifier: "14887-001M-pdf",
+          status: "success",
+          _progeressId: 0,
+          price: 1,
+          docid: "4841dfb1-e61b-4249-9546-326307255da8",
+          singleComplete: true,
+          index_u: 4,
+          jobId_d: "1e5447ee-6a5f-4c4c-9895-a95db3a43d90",
+          url_d:
+            "http://api.pdf365.cn/v2/docs/target?id=4841dfb1-e61b-4249-9546-326307255da8&key=LzExLzY1LzNi&actual=true"
+        },
+        {
+          isFolder: false,
+          isRoot: false,
+          id: 3,
+          fileType: "application/pdf",
+          name: "0.01M.pdf",
+          size: 14887,
+          relativePath: "0.01M.pdf",
+          paused: false,
+          error: false,
+          allError: false,
+          aborted: false,
+          averageSpeed: 0,
+          currentSpeed: 0,
+          _lastProgressCallback: 1541992767626,
+          _prevUploadedSize: 14887,
+          _prevProgress: 1,
+          uniqueIdentifier: "14887-001Mpdf",
+          status: "success",
+          _progeressId: 0,
+          price: 1,
+          docid: "f40d5f2c-4721-4001-b294-3e9bfb3958e3",
+          singleComplete: true,
+          index_u: 4,
+          jobId_d: "f3030c36-1838-414c-8842-38108e1d2417",
+          url_d:
+            "http://api.pdf365.cn/v2/docs/target?id=f40d5f2c-4721-4001-b294-3e9bfb3958e3&key=LzExLzY1LzNi&actual=true"
+        },
+        {
+          isFolder: false,
+          isRoot: false,
+          id: 4,
+          fileType: "application/pdf",
+          name: "2.0M测试 - 副本1.pdf",
+          size: 2096160,
+          relativePath: "2.0M测试 - 副本1.pdf",
+          paused: false,
+          error: false,
+          allError: false,
+          aborted: false,
+          averageSpeed: 0,
+          currentSpeed: 0,
+          _lastProgressCallback: 1541992769666,
+          _prevUploadedSize: 2096160,
+          _prevProgress: 1,
+          uniqueIdentifier: "2096160-20M-1pdf",
+          status: "success",
+          _progeressId: 0,
+          price: 1,
+          docid: "a2c8f718-a71f-49d7-aa0b-afc972452ef0",
+          singleComplete: true,
+          index_u: 4,
+          jobId_d: "0812aee1-388e-4ea1-a7ee-b96ac60732ca",
+          url_d:
+            "http://api.pdf365.cn/v2/docs/target?id=a2c8f718-a71f-49d7-aa0b-afc972452ef0&key=L2I3LzY3Lzg2&actual=true"
         }
       ],
       less_than: true, //  余额是否充足     充足 true
@@ -539,6 +606,7 @@ export default {
       //额度
       consume_balance: 0, //上传需要消耗额度
       balance_total: 0, // 用户拥有总额度
+      balance_total_Blance: 0, // 第一次额度不足后使用
       delated_blance: 0, //处理成功的额度
 
       //立即开始按钮
@@ -603,12 +671,12 @@ export default {
       ],
       //透明度
       opcityListSure: {
-        opcityMessage: "不透明度",
+        opcityMessage: "不透明",
         value: "1"
       },
       opcityList: [
         {
-          names: "不透明度",
+          names: "不透明",
           value: "1"
         },
         {
@@ -698,6 +766,7 @@ export default {
       lastList: [], //提交任务后成功的个数
       uploadsOver: false, //列表中没有任何的上传文件
       getTimeList: [], //定时器个数存储
+      getTimeListBlance: [], //处理成功 额度不足 定时器个数存储
       isFree: true // 整个功能是否免费   如果免费就没有关于额度任何的东西
     };
   },
@@ -783,6 +852,7 @@ export default {
       } else {
         this.isBtnStartChanges = false;
       }
+      
     }
   },
   created() {
@@ -835,18 +905,17 @@ export default {
       var waitingList = that.bbostlist.filter(
         item => item["status"] === "waiting"
       );
-   
+
       //判断是否有十个成功文件  成功的个数
       var successNum = that.bbostlist.filter(
         item => item["status"] === "success"
       );
       this.$leoBus.$emit("successNum", 10 - successNum.length);
       //判断只要没有十个成功，切没有等待状态下，就开启上传按钮
-      if( 10 - successNum.length>0){ 
-          if (waitingList.length == 0) {
-            this.$leoBus.$emit("btnSarting_btnSarts");
-            
-          } 
+      if (10 - successNum.length > 0) {
+        if (waitingList.length == 0) {
+          this.$leoBus.$emit("btnSarting_btnSarts");
+        }
       }
     });
     this.$leoBus.$on("boxlist", params => {
@@ -1002,9 +1071,9 @@ export default {
       var successNum = this.bbostlist.filter(
         item => item["status"] === "success"
       );
-      if(successNum.length!=10){
-           this.$leoBus.$emit("btnSarting_btnSarts"); //上传中开启 上传按钮  
-      } 
+      if (successNum.length != 10) {
+        this.$leoBus.$emit("btnSarting_btnSarts"); //上传中开启 上传按钮
+      }
       this.$leoBus.$emit("successNum", 10 - successNum.length);
     },
 
@@ -1051,12 +1120,14 @@ export default {
     },
     //弹出额度弹窗
     btnStart() {
+      var that = this;
       if (this.isBtnStart) return; //防止按钮多次触发
       this.isBtnStart = true;
 
       if (!this.isLogings) {
         var url = window.location.href;
         window.location.href = "/userLogin?url=" + encodeURIComponent(url);
+        this.this.isBtnStart = false;
         return;
       }
 
@@ -1083,15 +1154,16 @@ export default {
           success: function(data) {
             if (data.httpStatus == 200 && !data.code) {
               //"{"data":{"figure":"","balance":"6358.0","nickName":"娟玲","userType":"v1","userId":"900035423","isVip":false},"httpStatus":200,"success":true}"
-              if (data.data.balance - this.consume_balance >= 0) {
-                this.less_than = true;
+              that.balance_total = data.data.balance;
+              if (data.data.balance - that.consume_balance >= 0) {
+                that.less_than = true;
               } else {
-                this.less_than = false;
-              } 
-              this.isModal = true;
-              this.$leoBus.$emit("ModalisMask"); //打开遮罩
-            }else{ 
-                this.$message.error(data.message);
+                that.less_than = false;
+              }
+              that.isModal = true;
+              that.$leoBus.$emit("ModalisMask"); //打开遮罩
+            } else {
+              that.$message.error(data.message);
             }
           }
         });
@@ -1268,15 +1340,166 @@ export default {
               that.delatedNum++;
               that.ResultList.map(function(item) {
                 if (item.docid == daocidData) {
-                  that.delated_blance = that.delated_blance + item.price;
-                  item.url_d = data.data.downloadUrl;
-                  item.index_u = 4;
+                  if (data.data.balanceStatus == "success") {
+                    that.delated_blance = that.delated_blance + item.price;
+                    item.url_d = data.data.downloadUrl;
+                    item.index_u = 4;
+                  } else {
+                    that.delated_blance = that.delated_blance + item.price;
+                    item.url_d = "NoBalance";
+                    item.index_u = 4;
+                  }
                 }
               });
               that.bbostlist = [];
               that.bbostlist = that.ResultList;
               var clearList = that.getTimeList.filter(item => item[daocidData]);
               clearInterval(clearList[0][daocidData]);
+              var nums = that.ResultList.filter(item => item.index_u == 4);
+              if (nums.length == that.lastList.length) {
+                that.$leoBus.$emit("btnSarted"); //结束转换
+                that.getTimeList = []; //所有时间定时器数组
+                that.delateing = false; //  处理中结束    处理结果出来
+                that.changesOver = false; //处理结束后 开启水印内容置灰按钮
+                that.uploadsOver = false; //监听列表有文件上传
+              }
+            } else if (data.data.state == "FAIL") {
+              that.ResultList.map(function(item) {
+                if (item.docid == docid) {
+                  if (data.data.stateCode && data.data.stateCode == 10009) {
+                    item.message_y = "不支持加密文档，请去密码后重试，";
+                    item.message_y3 = "前往去密码";
+                    item.index_u = 1;
+                  } else {
+                    item.message_y = "转换失败";
+                    item.message_y2 = "【服务异常，请联系客服】";
+                    item.index_u = 1;
+                  }
+                }
+              });
+              that.bbostlist = [];
+              that.bbostlist = that.ResultList;
+              var clearList = that.getTimeList.filter(item => item[docid]);
+              clearInterval(clearList[0][docid]);
+              var nums = that.ResultList.filter(item => item.index_u == 1);
+              if (nums.length == that.lastList.length) {
+                that.$leoBus.$emit("btnSarted"); //结束转换
+                that.getTimeList = []; //所有时间定时器数组
+                that.delateing = false; //  处理中结束    处理结果出来
+                that.changesOver = false; //处理结束后 开启水印内容置灰按钮
+                that.uploadsOver = false; //监听列表有文件上传
+              }
+            }
+          } else {
+            that.ResultList.map(function(item) {
+              if (item.docid == docid) {
+                item.message_y = "转换失败";
+                item.message_y2 = "【服务异常，请联系客服】";
+                item.index_u = 1;
+              }
+            });
+            that.bbostlist = [];
+            that.bbostlist = that.ResultList;
+            var clearList = that.getTimeList.filter(item => item[docid]);
+            clearInterval(clearList[0][docid]);
+            var nums = that.ResultList.filter(item => item.index_u);
+            if (nums.length == that.lastList.length) {
+              that.$leoBus.$emit("btnSarted"); //结束转换
+              that.getTimeList = []; //所有时间定时器数组
+              that.delateing = false; //  处理中结束    处理结果出来
+              that.changesOver = false; //处理结束后 开启水印内容置灰按钮
+              that.uploadsOver = false; //监听列表有文件上传
+            }
+          }
+        }
+      });
+    },
+    noBlaceBtn(index, docid, jobId_d) {
+      var that = this;
+      that.ResultList[index].index_u = 3;
+      that.bbostlist = [];
+      that.bbostlist = that.ResultList;
+      $.ajax({
+        type: "get",
+        url: "https://www.pdf365.cn/v3Api/getUserInfo",
+        xhrFields: {
+          withCredentials: true // 携带跨域cookie
+        },
+        success: function(data) {
+          if (data.httpStatus == 200 && !data.code) {
+            //"{"data":{"figure":"","balance":"6358.0","nickName":"娟玲","userType":"v1","userId":"900035423","isVip":false},"httpStatus":200,"success":true}"
+
+            that.balance_total_Blance = Number(data.data.balance);
+            var noBlaceBtnSetTime = [];
+            noBlaceBtnSetTime[index] = setInterval(function() {
+              that.btnQueryNoBlance(docid, jobId_d);
+            }, 1000);
+            var obj = {};
+            obj[docid] = noBlaceBtnSetTime[index];
+            var hasBlaceNum = that.getTimeListBlance.filter(
+              item => item[docid]
+            );
+            if (hasBlaceNum.length > 0) {
+              for (
+                var k = 0, lens = that.getTimeListBlance.length;
+                k < lens;
+                k++
+              ) {
+                if (that.getTimeListBlance[k][docid]) {
+                  for (var i in that.getTimeListBlance[k]) {
+                    if (i == docid) {
+                      that.getTimeListBlance[k][i] = noBlaceBtnSetTime[index];
+                    }
+                  }
+                  // that.getTimeListBlance.splice(k, 1);
+                }
+              }
+            } else {
+              that.getTimeListBlance.push(obj);
+            }
+          }
+        }
+      });
+    },
+    btnQueryNoBlance(docid, jobId_d) {
+      var that = this;
+      //查询接口
+      $.ajax({
+        type: "get",
+        url: "https://www.pdf365.cn/v3Api/queryTask",
+        xhrFields: {
+          withCredentials: true // 携带跨域cookie
+        },
+        async: false,
+        data: {
+          docId: docid, //文档id
+          jobId: jobId_d //   任务id
+        },
+        success: function(data) {
+          if (data.httpStatus == 200 && !data.code) {
+            var daocidData = data.data.docId;
+            if (data.data.state == "SUCCESS") {
+              that.ResultList.map(function(item) {
+                if (item.docid == daocidData) {
+                  if (data.data.balanceStatus == "success") {
+                    that.balance_total_Blance =
+                      Number(that.balance_total_Blance) -
+                      Number(data.data.filePrice);
+                    item.url_d = data.data.downloadUrl;
+                    item.index_u = 4;
+                  } else {
+                    item.url_d = "NoBalance";
+                    item.index_u = 4;
+                  }
+                }
+              });
+              that.bbostlist = [];
+              that.bbostlist = that.ResultList;
+              var clearList = that.getTimeListBlance.filter(
+                item => item[daocidData]
+              );
+              clearInterval(clearList[0][daocidData]);
+
               var nums = that.ResultList.filter(item => item.index_u == 4);
               if (nums.length == that.lastList.length) {
                 that.$leoBus.$emit("btnSarted"); //结束转换
@@ -1288,12 +1511,15 @@ export default {
               that.ResultList.map(function(item) {
                 if (item.docid == docid) {
                   item.message_y = "转换失败【服务异常，请联系客服】";
+                  item.message_y2 = "【服务异常，请联系客服】";
                   item.index_u = 1;
                 }
               });
               that.bbostlist = [];
               that.bbostlist = that.ResultList;
-              var clearList = that.getTimeList.filter(item => item[docid]);
+              var clearList = that.getTimeListBlance.filter(
+                item => item[docid]
+              );
               clearInterval(clearList[0][docid]);
               var nums = that.ResultList.filter(item => item.index_u == 4);
               if (nums.length == that.lastList.length) {
@@ -1306,7 +1532,8 @@ export default {
           } else {
             that.ResultList.map(function(item) {
               if (item.docid == docid) {
-                item.message_y = "转换失败【服务异常，请联系客服】";
+                item.message_y = "转换失败";
+                item.message_y2 = "【服务异常，请联系客服】";
                 item.index_u = 1;
               }
             });
@@ -1325,7 +1552,6 @@ export default {
         }
       });
     },
-
     fontSelect(item) {
       //字体选择
       this.fontListSure = {
@@ -1492,6 +1718,14 @@ export default {
             display: inline-block;
             width: 69px;
           }
+          .NoBlanceS {
+            color: #ed4343;
+            font-size: 12px;
+            a {
+              color: #ed4343;
+              text-decoration: underline;
+            }
+          }
           .noWeb {
             color: #ed4343;
             font-size: 12px;
@@ -1518,6 +1752,14 @@ export default {
               height: 6px;
               width: 57%;
               border-radius: 3px;
+            }
+          }
+          .error {
+            color: #ff6833;
+            a {
+              color: #ff6833;
+              text-decoration: underline;
+              cursor: pointer;
             }
           }
           .message_states_fours {
@@ -1600,7 +1842,8 @@ export default {
         border: 1px solid #d2d2d2;
         outline: none;
         border-radius: 2px;
-        overflow:hidden
+        overflow: hidden;
+        font-size: 12px;
       }
       .changesOver {
         cursor: not-allowed;
@@ -1679,7 +1922,6 @@ export default {
         text-align: center;
         border: 1px solid #378888;
         border-color: #d2d2d2;
-        border-right: none;
         top: 0;
       }
 
@@ -1696,7 +1938,7 @@ export default {
         text-align: center;
         position: relative;
         top: 0px;
-        left: -5px;
+        left: -4px;
       }
       @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
         .unit {

@@ -315,8 +315,7 @@ export default {
     display: inline-block;
     .heards_l_icon {
       width: 49px;
-      height: 48px;
-      background: yellow;
+      height: 48px; 
     }
     .heards_l_list {
       margin-top: 1px;

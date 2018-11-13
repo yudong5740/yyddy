@@ -351,6 +351,12 @@ export default {
     },
     adds(files, fileList) {
       //上传文件 
+      //  if(fileList.length>2){
+      //    fileList= fileList.splice(0,2)
+      //    files= files.splice(0,)
+      //  } 
+
+
        if((files.filter(item=>item.fileType=="application/pdf").length!=files.length)){
          
               files.ignored = true;

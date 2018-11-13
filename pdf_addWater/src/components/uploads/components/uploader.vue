@@ -104,6 +104,7 @@ export default {
   },
   data() {
     return {
+      isFileList: false, //控制选择页面的选择按钮
       btnSarting_btnSarted:false,   //上传中
       btnSarting_btnSarts:true,   //开始上传前后
       started: false,
@@ -111,7 +112,6 @@ export default {
       fileList: [],
       bg: "",
       isdrop: true,
-      isFileList: true, //控制选择页面的选择按钮
       attrs: {
         accept: "application/pdf"
       },
@@ -213,8 +213,7 @@ export default {
       that.btnSarted = false;
     });
     this.$leoBus.$on("btnSarted", () => {
-      //处理完成后 开启重新选择图片按钮
-      debugger
+      //处理完成后 开启重新选择图片按钮 
       that.btnSarted = true;
       that.btnSarteds=false 
     }); 
