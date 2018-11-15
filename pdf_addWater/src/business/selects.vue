@@ -129,11 +129,11 @@ export default {
   .select_input {
     color: #333333;
     width: 109px;
-    height: 30px;
-    line-height: 30px;
+    height: 29px;
+    line-height: 29px;
     outline: none;
     border-radius: 2px;
-    border: 0.5px solid #d2d2d2;
+    border: 1px solid #d2d2d2;
     text-indent: 10px;
     cursor: default;
     background: url("../assets/input_down.png") no-repeat;

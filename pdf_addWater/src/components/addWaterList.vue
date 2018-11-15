@@ -16,7 +16,8 @@
                  </template> 
              </template>
              <template v-else>
-               上传文件
+               上传文件  
+               <!-- {{allComplete}}{{bbostlist.length}} -->
              </template>
           </span>
         </div>
@@ -74,7 +75,7 @@
                   </template>
                   <template v-else> 
                     <div style="display: inline-block;margin-top:18px;margin-right:12px;">
-                      <m-progress :widths="'110px'" :endPro='90'></m-progress> 
+                      <m-progress :widths="'179px'" :endPro='90' ></m-progress> 
                     </div> 
                     <template v-if="!isDelates">
                       正在上传
@@ -98,7 +99,7 @@
                     <template v-else> 
                       <template v-if="item.price">
                         <div style="display: inline-block;margin-top:18px;margin-right:12px;">
-                          <m-progress :widths="'110px'" :endPro='90'></m-progress>
+                          <m-progress :widths="'179px'" :endPro='90'></m-progress>
                         </div> 
                         <template v-if="isDelates">
                             <template v-if="delateing">
@@ -202,10 +203,10 @@
           <span class="title">类型:</span>
           <template v-if="changesOver">
               <label>
-                <input type="radio" name="radios" value="1" checked   @click="checks(1)"/> <span  :class="{OnAcitve:isOnFont}">文字</span>
+                <input type="radio" name="radios" value="1" :checked="isOnFont"   @click="checks(1)"/> <span  :class="{OnAcitve:isOnFont}">文字</span>
               </label>
               <label>
-                <input type="radio" name="radios" value="2"      @click="checks(2)"/> <span :class="{OnAcitve:!isOnFont}">图片</span>
+                <input type="radio" name="radios" value="2"   :checked="!isOnFont"   @click="checks(2)"/> <span :class="{OnAcitve:!isOnFont}">图片</span>
               </label>
           </template>
           <template v-else>
@@ -260,7 +261,8 @@
             </div>
           </div>
         </div>
-        <div  v-show="!isOnFont" >
+         <!-- v-show="!isOnFont" -->
+        <div v-show="!isOnFont" >
           <div class="upImg">
             <span class="title">上传图片:</span>
             <template v-if="changesOver">
@@ -317,10 +319,10 @@
           <span class="title">放置层:</span>
           <template v-if="changesOver">
             <label>
-              <input type="radio" name="radio" value="1"   checked  @click="placeW(1)"/> <span  :class="{OnAcitve:isOnPlace}">PDF文字内容上方</span>
+              <input type="radio" name="radio" value="1"    :checked="isOnPlace"  @click="placeW(1)"/> <span  :class="{OnAcitve:isOnPlace}">PDF文字内容上方</span>
             </label>
             <label>
-              <input type="radio" name="radio" value="2"   @click="placeW(2)"/> <span   :class="{OnAcitve:!isOnPlace}">PDF文字内容下方</span>
+              <input type="radio" name="radio" value="2"   :checked="!isOnPlace"   @click="placeW(2)"/> <span   :class="{OnAcitve:!isOnPlace}">PDF文字内容下方</span>
             </label>
           </template>
           <template v-else>
@@ -332,7 +334,19 @@
             </label>
           </template>
         </div>
-            <template v-if="changesOver">
+            <template v-if="onBtnChanges">
+              <template v-if='!isBtnStartChanges'>
+                <div class="btnStart"   >立即开始</div>
+              </template>
+              <template v-else>
+                  <div class="btnStart" :class="{active:isBtnStartChanges}"  @click="btnStart">立即开始</div>
+              </template>
+            </template>
+            <template v-else>
+                 <div class="btnStart"   >立即开始</div>
+            </template>
+
+            <!-- <template v-if="changesOver">
               <template v-if='!isBtnStartChanges'>
                 <div class="btnStart"   >立即开始</div>
               </template>
@@ -342,7 +356,7 @@
             </template>
             <template v-else>
                 <div class="btnStart" >立即开始</div>
-            </template>
+            </template> -->
 
        </template>
       </div> 
@@ -397,7 +411,8 @@ export default {
   name: "addWater_list",
   data() {
     return {
-      NoFileList: true, //加水印功能页面的内容展示
+      NoFileList: false, //加水印功能页面的内容展示
+      logout: true,
       changesOver: true, //水印内容可编辑
       isLogings: false, //是否登录
 
@@ -609,11 +624,12 @@ export default {
       balance_total_Blance: 0, // 第一次额度不足后使用
       delated_blance: 0, //处理成功的额度
 
+
       //立即开始按钮
       isBtnStartChangesNoback: false, //立即开始后  置灰按钮出来
       isBtnStart: false, //消除按钮多次触发
       isBtnStartChanges: false, //是否允许开始转换
-
+      onBtnChanges: true, //总的开始进行处理的按钮
       fontSize: "42", //文字默认42px
       fontSizeTime: null,
       textContent: "", //文字类型的 内容
@@ -767,7 +783,8 @@ export default {
       uploadsOver: false, //列表中没有任何的上传文件
       getTimeList: [], //定时器个数存储
       getTimeListBlance: [], //处理成功 额度不足 定时器个数存储
-      isFree: true // 整个功能是否免费   如果免费就没有关于额度任何的东西
+      isFree: true, // 整个功能是否免费   如果免费就没有关于额度任何的东西
+      storagelistLong: 0 //storage 的列表存储长度
     };
   },
   watch: {
@@ -782,6 +799,7 @@ export default {
       } else {
         this.isBtnStartChanges = false;
       }
+      this.setStorage();
     },
     textContent(val) {
       //文字内容
@@ -793,6 +811,8 @@ export default {
       if (val.length > 512) {
         this.textContent = val.substring(0, 512);
       }
+
+      this.setStorage();
     },
     isOnFont(val) {
       //水印类型
@@ -826,6 +846,7 @@ export default {
         } else {
           that.fontSize = Number(that.fontSize);
         }
+        that.setStorage();
       }, 1000);
     },
     // fontSizeBlur(){
@@ -852,7 +873,20 @@ export default {
       } else {
         this.isBtnStartChanges = false;
       }
-      
+      this.setStorage();
+      if (this.bbostlist.length > 0) {
+        //是否显示选择页面
+        this.$leoBus.$emit("fileLists", true);
+      } else {
+        this.$leoBus.$emit("fileLists", false);
+      }
+      this.$leoBus.$emit("copyBBostlist", this.bbostlist);
+      if (val.filter(item => item.price).length == 10) {
+        this.$leoBus.$emit("btnSarting_btnSarted"); // 开启上传置灰按钮
+      }
+      if (this.bbostlist.length == 0) {
+        sessionStorage.removeItem("watermark");
+      }
     }
   },
   created() {
@@ -861,17 +895,64 @@ export default {
     this.getTypeInfo();
     window.onbeforeunload = function() {
       if (that.uploadsOver) {
+        setTimeout(function() {
+          that.logout = true;
+          that.setStorage();
+        }, 500);
         return "刷新当前页，正在上传的文件将无法保存，请确认！";
       }
     };
+
+    if (
+      sessionStorage.getItem("watermark") &&
+      JSON.parse(sessionStorage.getItem("watermark")).storagelist.length > 0
+    ) {
+      var item = JSON.parse(sessionStorage.getItem("watermark"));
+      this.bbostlist = item.storagelist.filter(
+        items => items.status == "success"
+      );
+      this.storagelistLong = item.storagelist.filter(
+        items => items.status == "success"
+      ).length;
+      this.roteListSure = item.roteListSure;
+      this.opcityListSure = item.opcityListSure;
+      this.colorListSure = item.colorListSure;
+      this.fontListSure = item.fontListSure;
+      this.isOnFont = item.isOnFont;
+      this.isOnPlace = item.isOnPlace;
+      this.fontSize = item.fontSize;
+      this.textContent = item.textContent;
+      this.isBtnStartChanges = item.isBtnStartChanges;
+      this.allComplete = item.allComplete;
+      this.key = item.key;
+      this.sum = item.sum;
+      this.isLogings = item.isLogings;
+      this.consume_balance = item.consume_balance;
+      this.fileLists = item.fileLists;
+      this.chose_img_btn_status = item.chose_img_btn_status;
+      var successNum = item.storagelist.filter(
+        item => item["status"] === "success"
+      );
+      if (successNum.length != 10) {
+        this.$leoBus.$emit("btnSarting_btnSarts"); //上传后 上传按钮
+      } else {
+        this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启 上传按钮
+      }
+      this.$leoBus.$emit("successNum", 10 - successNum.length);
+    }
   },
   mounted() {
     var that = this;
-    this.$leoBus.$on("btnSarting_btnSarted", () => {
-      //上传中开启置灰按钮
-      that.allComplete = false;
-      that.isBtnStartChanges = false;
+    this.$leoBus.$on("logout", () => {
+      //获取传递的参数并进行操作
+      that.logout = false;
+      sessionStorage.clear();
     });
+    // this.$leoBus.$on("btnSarting_btnSarted", () => {
+    //   //上传中开启置灰按钮
+    //   that.allComplete = false;
+    //   that.isBtnStartChanges = false;
+    // });
     this.$leoBus.$on("isUploadsOver", () => {
       //监听列表有文件再上传中
       that.uploadsOver = true;
@@ -920,8 +1001,25 @@ export default {
     });
     this.$leoBus.$on("boxlist", params => {
       //每次控件上传列表变化，页面展示也跟着变 (单个文件)
-      that.bbostlist = params;
-      this.$leoBus.$emit("copyBBostlist", that.bbostlist);
+      // that.bbostlist = params;
+
+      var list = [].concat(that.bbostlist);
+      that.bbostlist = [];
+      for (var k = 0, lens = params.length; k < lens; k++) {
+        if (list.filter(item => item.name == params[k].name).length > 0) {
+          for (var i = 0, ilens = list.length; i < ilens; i++) {
+            if (params[k].name == list[i].name) {
+              list[i] == params[i];
+            }
+          }
+        } else {
+          list.push(params[k]);
+        }
+        that.bbostlist = list;
+      }
+      if (that.storagelistLong) {
+        that.bbostlist = list;
+      }
     });
     this.$leoBus.$on("exceptions", params => {
       //接口正常 返回异常处理
@@ -941,10 +1039,24 @@ export default {
       that.sum += nums;
       that.allComplete = false;
     });
-    this.$leoBus.$on("kes", () => {
+    this.$leoBus.$on("kes", params => {
       //上传完成个数
 
-      that.key = this.bbostlist.filter(item => item.price).length;
+      that.key = that.bbostlist.filter(item => item.price).length;
+      var list = [].concat(that.bbostlist);
+      that.bbostlist = [];
+      for (var k = 0, lens = params.length; k < lens; k++) {
+        if (list.filter(item => item.name == params[k].name).length > 0) {
+          for (var i = 0, ilens = list.length; i < ilens; i++) {
+            if (params[k].name == list[i].name) {
+              list[i] == params[i];
+            }
+          }
+        } else {
+          list.push(params[k]);
+        }
+        that.bbostlist = list;
+      }
     });
     this.$leoBus.$on("consumptionFilePrice", nums => {
       //上传总的消耗额度
@@ -960,21 +1072,49 @@ export default {
     // });
   },
   methods: {
+    setStorage() {
+      if (!this.isDelates) {
+        if (this.logout) {
+          var list = {
+            storagelist: this.bbostlist,
+            yd: "余东",
+            roteListSure: this.roteListSure,
+            opcityListSure: this.opcityListSure,
+            colorListSure: this.colorListSure,
+            fontListSure: this.fontListSure,
+            isOnFont: this.isOnFont,
+            isOnPlace: this.isOnPlace,
+            fontSize: this.fontSize,
+            textContent: this.textContent,
+            isBtnStartChanges: this.isBtnStartChanges,
+            allComplete: this.allComplete, //是否都上传完成
+            key: this.key, // 上传完成个数
+            sum: this.sum,
+            consume_balance: this.consume_balance,
+            isLogings: this.isLogings,
+            fileLists: this.fileLists,
+            chose_img_btn_status: this.chose_img_btn_status
+          };
+          sessionStorage["watermark"] = JSON.stringify(list);
+        }
+      }
+    },
     //开始转换
     //余额够 开始转换
     GoChanges() {
-      this.$leoBus.$emit("ModalNoMask"); //关闭遮罩
-      this.noMask(); //关闭弹窗
-      this.isBtnStartChanges = false; //按钮置灰
-      this.index_u_status = false; //  关闭上传列表 开启处理列表
+      this.$leoBus.$emit("ModalNoMask"); //关闭遮罩  
       this.isDelates = true; //开始处理阶段
+      this.noMask(); //关闭弹窗
+      this.index_u_status = false; //  关闭上传列表 开启处理列表
       this.uploadsOver = true; //监听列表有文件上传
       this.changesOver = false;
+      this.isBtnStartChanges = false; //立即开始按钮 置灰
+      this.onBtnChanges = false; //立即开始总按钮 置灰
       this.ResultList = this.bbostlist.filter(item => item.price);
       this.bbostlist = [];
       this.bbostlist = this.ResultList;
+      sessionStorage.removeItem("watermark");
       this.$leoBus.$emit("onBbtnSarting"); //开始转换
-
       this.ToOrder(this.numlists);
     },
     //余额不够  关闭弹窗
@@ -1018,6 +1158,7 @@ export default {
         this.$message.error("图片最大30KB");
       } else {
         this.chose_img_btn_status = "loading";
+        this.setStorage();
       }
       return isTure;
     },
@@ -1027,6 +1168,7 @@ export default {
         this.fileImageId = res.data.imgId;
         this.fileLists.push(file);
         this.chose_img_btn_status = "success";
+        this.setStorage();
       } else {
         this.$message.error(res.message);
       }
@@ -1066,7 +1208,15 @@ export default {
       if (this.bbostlist.length == 0) {
         (this.ResultNumList = []), (this.lastList = []);
       }
-      this.$leoBus.$emit("uploadersss", num);
+      if (this.storagelistLong > 0) {
+        if (num >= this.storagelistLong) {
+          this.$leoBus.$emit("uploadersss", num - this.storagelistLong);
+        } else {
+          this.storagelistLong--;
+        }
+      } else {
+        this.$leoBus.$emit("uploadersss", num);
+      }
 
       var successNum = this.bbostlist.filter(
         item => item["status"] === "success"
@@ -1079,11 +1229,16 @@ export default {
 
     //重试
     retry(num) {
-      this.$leoBus.$emit("retryss", num);
+      if (this.bbostlist.filter(item => item.price).length == 10) {
+        this.tips("一次上传最多支持10个文件");
+      } else {
+        this.$leoBus.$emit("retryss", num);
+      }
     },
     //用户信息数据
     //获取用户信息
     getUserInfo() {
+      // alert("刷新了")
       var that = this;
       $.ajax({
         type: "get",
@@ -1092,14 +1247,20 @@ export default {
           withCredentials: true // 携带跨域cookie
         },
         success: function(data) {
-          if (data.httpStatus == 200 && !data.code) {
+          if (data.httpStatus == 200 && !data.code&&data.data) {
             //"{"data":{"figure":"","balance":"6358.0","nickName":"娟玲","userType":"v1","userId":"900035423","isVip":false},"httpStatus":200,"success":true}"
 
             that.balance_total = data.data.balance;
             //导航栏的头部信息
+            // alert(data.data.nickName)
             that.$leoBus.$emit("user_info", data.data);
             that.isLogings = true;
+          }else{
+            // alert(data.data.message+"检测登入")
           }
+        },
+        error:function(){
+          // alert("接口错误")
         }
       });
     },
@@ -1134,15 +1295,17 @@ export default {
       if (this.isFree) {
         this.$leoBus.$emit("ModalNoMask"); //关闭遮罩
         this.noMask(); //关闭弹窗
-        this.isBtnStartChanges = false; //按钮置灰
         this.index_u_status = false; //  关闭上传列表 开启处理列表
-        this.isDelates = true; //开始处理阶段
+        this.isDelates = true; //开始处理阶段 
+         sessionStorage.removeItem("watermark");
         this.uploadsOver = true; //监听列表有文件上传
         this.changesOver = false;
+        this.isBtnStartChanges = false; //立即开始按钮 置灰
+        this.onBtnChanges = false; //立即开始总按钮 置灰
         this.ResultList = this.bbostlist.filter(item => item.price);
         this.bbostlist = [];
         this.bbostlist = this.ResultList;
-        this.$leoBus.$emit("onBbtnSarting"); //开始转换
+        this.$leoBus.$emit("onBbtnSarting"); //开始转换 
         this.ToOrder(this.numlists);
       } else {
         $.ajax({
@@ -1216,6 +1379,29 @@ export default {
             } else {
               that.ResultList[numlists].index_u = 1;
               that.ResultList[numlists].message_y = data.message;
+              numlists++;
+              that.ToOrder(numlists);
+            }
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus == "error") {
+            if (numlists == that.ResultList.length - 1) {
+              that.ResultList[numlists].index_u = 1;
+              that.ResultList[numlists].message_y = "网络无连接或请求超时";
+              that.numlists = 0;
+              if (that.ResultNumList.length > 0) {
+                that.btnTask(that.numlists);
+              } else {
+                that.bbostlist = [];
+                that.bbostlist = that.ResultList;
+                that.$leoBus.$emit("btnSarted"); //结束转换
+                that.delateing = false; //  处理中结束    处理结果出来
+                that.uploadsOver = false; //监听列表有文件上传
+              }
+            } else {
+              that.ResultList[numlists].index_u = 1;
+              that.ResultList[numlists].message_y = "网络无连接或请求超时";
               numlists++;
               that.ToOrder(numlists);
             }
@@ -1299,7 +1485,25 @@ export default {
                 data.message;
               that.numlists = 0;
               if (that.lastList.length > 0) {
-                that.btnTask(that.numlists);
+                for (
+                  var k = 0, lens = that.ResultNumList.length;
+                  k < lens;
+                  k++
+                ) {
+                  (function(e) {
+                    setTimeList[e] = setInterval(function() {
+                      console.log(e);
+                      that.btnQuery(
+                        that.ResultList[that.ResultNumList[e]].docid,
+                        that.ResultList[that.ResultNumList[e]].jobId_d
+                      );
+                    }, 1000);
+                  })(k);
+                  var obj = {};
+                  obj[that.ResultList[that.ResultNumList[k]].docid] =
+                    setTimeList[k];
+                  that.getTimeList.push(obj);
+                }
               } else {
                 that.bbostlist = [];
                 that.bbostlist = that.ResultList;
@@ -1311,6 +1515,49 @@ export default {
               that.ResultList[that.ResultNumList[numlists]].index_u = 1;
               that.ResultList[that.ResultNumList[numlists]].message_y =
                 data.message;
+              numlists++;
+              that.btnTask(numlists);
+            }
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus == "error") {  
+            if (numlists == that.ResultNumList.length - 1) {
+              that.ResultList[that.ResultNumList[numlists]].index_u = 1;
+              that.ResultList[that.ResultNumList[numlists]].message_y =
+                "网络无连接或请求超时";
+              that.numlists = 0;
+              if (that.lastList.length > 0) {
+                for (
+                  var k = 0, lens = that.ResultNumList.length;
+                  k < lens;
+                  k++
+                ) {
+                  (function(e) {
+                    setTimeList[e] = setInterval(function() {
+                      console.log(e);
+                      that.btnQuery(
+                        that.ResultList[that.ResultNumList[e]].docid,
+                        that.ResultList[that.ResultNumList[e]].jobId_d
+                      );
+                    }, 1000);
+                  })(k);
+                  var obj = {};
+                  obj[that.ResultList[that.ResultNumList[k]].docid] =
+                    setTimeList[k];
+                  that.getTimeList.push(obj);
+                }
+              } else {
+                that.bbostlist = [];
+                that.bbostlist = that.ResultList;
+                that.$leoBus.$emit("btnSarted"); //结束转换
+                that.delateing = false; //  处理中结束    处理结果出来
+                that.uploadsOver = false; //监听列表有文件上传
+              }
+            } else {
+              that.ResultList[that.ResultNumList[numlists]].index_u = 1;
+              that.ResultList[that.ResultNumList[numlists]].message_y =
+                "网络无连接或请求超时";
               numlists++;
               that.btnTask(numlists);
             }
@@ -1355,8 +1602,9 @@ export default {
               that.bbostlist = that.ResultList;
               var clearList = that.getTimeList.filter(item => item[daocidData]);
               clearInterval(clearList[0][daocidData]);
-              var nums = that.ResultList.filter(item => item.index_u == 4);
-              if (nums.length == that.lastList.length) {
+              var numsEr = that.ResultList.filter(item => item.index_u == 1);
+              var numsSu = that.ResultList.filter(item => item.index_u == 4);
+              if (numsEr.length + numsSu.length == that.lastList.length) {
                 that.$leoBus.$emit("btnSarted"); //结束转换
                 that.getTimeList = []; //所有时间定时器数组
                 that.delateing = false; //  处理中结束    处理结果出来
@@ -1371,8 +1619,7 @@ export default {
                     item.message_y3 = "前往去密码";
                     item.index_u = 1;
                   } else {
-                    item.message_y = "转换失败";
-                    item.message_y2 = "【服务异常，请联系客服】";
+                    item.message_y = "转换失败【服务异常，请联系客服】";
                     item.index_u = 1;
                   }
                 }
@@ -1381,8 +1628,9 @@ export default {
               that.bbostlist = that.ResultList;
               var clearList = that.getTimeList.filter(item => item[docid]);
               clearInterval(clearList[0][docid]);
-              var nums = that.ResultList.filter(item => item.index_u == 1);
-              if (nums.length == that.lastList.length) {
+              var numsEr = that.ResultList.filter(item => item.index_u == 1);
+              var numsSu = that.ResultList.filter(item => item.index_u == 4);
+              if (numsEr.length + numsSu.length == that.lastList.length) {
                 that.$leoBus.$emit("btnSarted"); //结束转换
                 that.getTimeList = []; //所有时间定时器数组
                 that.delateing = false; //  处理中结束    处理结果出来
@@ -1393,8 +1641,7 @@ export default {
           } else {
             that.ResultList.map(function(item) {
               if (item.docid == docid) {
-                item.message_y = "转换失败";
-                item.message_y2 = "【服务异常，请联系客服】";
+                item.message_y = "转换失败【服务异常，请联系客服】";
                 item.index_u = 1;
               }
             });
@@ -1402,8 +1649,9 @@ export default {
             that.bbostlist = that.ResultList;
             var clearList = that.getTimeList.filter(item => item[docid]);
             clearInterval(clearList[0][docid]);
-            var nums = that.ResultList.filter(item => item.index_u);
-            if (nums.length == that.lastList.length) {
+            var numsEr = that.ResultList.filter(item => item.index_u == 1);
+            var numsSu = that.ResultList.filter(item => item.index_u == 4);
+            if (numsEr.length + numsSu.length == that.lastList.length) {
               that.$leoBus.$emit("btnSarted"); //结束转换
               that.getTimeList = []; //所有时间定时器数组
               that.delateing = false; //  处理中结束    处理结果出来
@@ -1411,6 +1659,32 @@ export default {
               that.uploadsOver = false; //监听列表有文件上传
             }
           }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus == "error") {
+            that.ResultList.map(function(item) {
+              if (item.docid == docid) {
+                item.message_y = "网络无连接或请求超时";
+                item.index_u = 1;
+              }
+            });
+            that.bbostlist = [];
+            that.bbostlist = that.ResultList;
+            var clearList = that.getTimeList.filter(item => item[docid]);
+            clearInterval(clearList[0][docid]);
+            var numsEr = that.ResultList.filter(item => item.index_u == 1);
+            var numsSu = that.ResultList.filter(item => item.index_u == 4);
+            if (numsEr.length + numsSu.length == that.lastList.length) {
+              that.$leoBus.$emit("btnSarted"); //结束转换
+              that.getTimeList = []; //所有时间定时器数组
+              that.delateing = false; //  处理中结束    处理结果出来
+              that.changesOver = false; //处理结束后 开启水印内容置灰按钮
+              that.uploadsOver = false; //监听列表有文件上传
+            }
+          }
+          // console.log(jqXHR)
+          // console.log(textStatus)
+          // console.log(errorThrown)
         }
       });
     },
@@ -1510,9 +1784,14 @@ export default {
             } else if (data.data.state == "FAIL") {
               that.ResultList.map(function(item) {
                 if (item.docid == docid) {
-                  item.message_y = "转换失败【服务异常，请联系客服】";
-                  item.message_y2 = "【服务异常，请联系客服】";
-                  item.index_u = 1;
+                  if (data.data.stateCode && data.data.stateCode == 10009) {
+                    item.message_y = "不支持加密文档，请去密码后重试，";
+                    item.message_y3 = "前往去密码";
+                    item.index_u = 1;
+                  } else {
+                    item.message_y = "转换失败【服务异常，请联系客服】";
+                    item.index_u = 1;
+                  }
                 }
               });
               that.bbostlist = [];
@@ -1532,8 +1811,7 @@ export default {
           } else {
             that.ResultList.map(function(item) {
               if (item.docid == docid) {
-                item.message_y = "转换失败";
-                item.message_y2 = "【服务异常，请联系客服】";
+                item.message_y = "转换失败【服务异常，请联系客服】";
                 item.index_u = 1;
               }
             });
@@ -1549,6 +1827,29 @@ export default {
               that.uploadsOver = false; //监听列表有文件上传
             }
           }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus == "error") {
+            that.ResultList.map(function(item) {
+              if (item.docid == docid) {
+                item.message_y = "网络无连接或请求超时";
+                item.index_u = 1;
+              }
+            });
+            that.bbostlist = [];
+            that.bbostlist = that.ResultList;
+            var clearList = that.getTimeList.filter(item => item[docid]);
+            clearInterval(clearList[0][docid]);
+            var numsEr = that.ResultList.filter(item => item.index_u == 1);
+            var numsSu = that.ResultList.filter(item => item.index_u == 4);
+            if (numsEr.length + numsSu.length == that.lastList.length) {
+              that.$leoBus.$emit("btnSarted"); //结束转换
+              that.getTimeList = []; //所有时间定时器数组
+              that.delateing = false; //  处理中结束    处理结果出来
+              that.changesOver = false; //处理结束后 开启水印内容置灰按钮
+              that.uploadsOver = false; //监听列表有文件上传
+            }
+          }
         }
       });
     },
@@ -1558,6 +1859,7 @@ export default {
         fontMessage: item.names,
         value: item.value
       };
+      this.setStorage();
     },
     opcitySelect(item) {
       // this.opcityListSure = JSON.parse(JSON.stringify(item));
@@ -1565,18 +1867,22 @@ export default {
         opcityMessage: item.names,
         value: item.value
       };
+      this.setStorage();
     },
     roteSelect(item) {
       this.roteListSure = {
         roteMessage: item.names,
         value: item.value
       };
+
+      this.setStorage();
     },
     colorSelect(item) {
       this.colorListSure = {
         colorMessage: item.names,
         value: item.value
       };
+      this.setStorage();
     },
 
     checks(value) {
@@ -1586,6 +1892,7 @@ export default {
       } else {
         this.isOnFont = false;
       }
+      this.setStorage();
     },
     placeW(value) {
       //放置层
@@ -1594,6 +1901,10 @@ export default {
       } else {
         this.isOnPlace = false;
       }
+      this.setStorage();
+    },
+    tips(value) {
+      this.$message.error(value);
     }
   },
 
@@ -1619,6 +1930,7 @@ export default {
     padding: 46px 49px 137px 32px;
     position: relative;
     margin-bottom: 72px;
+    border: 1px solid #e4e4e4;
     .contains_content_Otitle {
       .circularOne {
         width: 33px;
@@ -1932,7 +2244,7 @@ export default {
         display: inline-block;
         width: 37px;
         height: 31px;
-        background: #efefef;
+        background: #dddddd;
         color: #666666;
         line-height: 30px;
         text-align: center;
@@ -1945,7 +2257,7 @@ export default {
           display: inline-block;
           width: 37px;
           height: 31px;
-          background: #efefef;
+          background: #dddddd;
           color: #666666;
           line-height: 30px;
           text-align: center;
@@ -2079,7 +2391,7 @@ export default {
         cursor: default;
         .chose_img_btn {
           color: #333333 !important;
-          height: 33px;
+          height: 32px;
           line-height: 10px;
           width: 108px;
           border: none;

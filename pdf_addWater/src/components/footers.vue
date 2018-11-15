@@ -196,7 +196,7 @@ export default {
             .sharebar-wx {
               background-image: url(../assets/footers/WX.png);
               background-position: 0px -56px;
-              width: 28px;
+              width: 27px;
               height: 28px;
             }
             .sharebar-wx:hover {

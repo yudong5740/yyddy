@@ -240,8 +240,7 @@ export default {
       this.file.resume();
       this._actionCheck();
     },
-    remove() {
-      debugger;
+    remove() { 
       this.file.cancel();
     },
     retry() {

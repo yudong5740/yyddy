@@ -145,11 +145,11 @@
     <m-footers></m-footers> 
   </div>
 </template>
-<script>  
-import $ from "jquery"; 
+<script>
+import $ from "jquery";
 import heards from "../components/heards.vue";
-import Mfooters from "../components/footers"; 
-import Mabouts from "../pages/abouts"; 
+import Mfooters from "../components/footers";
+import Mabouts from "../pages/abouts";
 import MSelects from "../business/selects";
 import mst from "../business/seletcs_color.vue";
 import MAddWaterList from "../components/addWaterList";
@@ -158,12 +158,12 @@ export default {
   data() {
     return {
       isMark: false, //遮罩
-      windowHeight: "0", //浏览器的窗口高度 
-      isFileList: true, //控制选择页面的选择按钮  
+      windowHeight: "0", //浏览器的窗口高度
+      isFileList: true, //控制选择页面的选择按钮
       entrance_content_icon: [
         {
           imgs: require("../assets/choice_1.png"),
-          names: "拖拽或选择文件"
+          names: "选择文件"
         },
         {
           imgs: require("../assets/choice_5.png"),
@@ -177,45 +177,44 @@ export default {
           imgs: require("../assets/choice_3.png"),
           names: "添加完成，下载文件"
         }
-      ], 
+      ],
       //在线PDF转Word 模块
       explain_list: [
         {
           imgs: require("../assets/explain_6.png"),
-          alt:"PDF加水印效果",
+          alt: "PDF加水印效果",
           title: "加水印效果",
           text:
             "PDF加水印功能可快速直接地进行在线PDF加水印，支持PDF文字水印，PDF图片水印一键添加。"
         },
         {
           imgs: require("../assets/explain_2.png"),
-          alt:"PDF加水印速度",
+          alt: "PDF加水印速度",
           title: "加水印速度",
           text: "上传PDF文档后，一键操作，仅需数秒便完成PDF加水印操作。"
         },
         {
           imgs: require("../assets/explain_3.png"),
-          alt:"PDF加水印适用系统",
+          alt: "PDF加水印适用系统",
           title: "适用系统",
           text:
             "PDF加水印功能适用于所有计算机，包括Mac、Windows及Linux，无拘无束体验在线PDF加水印。"
         },
         {
           imgs: require("../assets/explain_4.png"),
-          alt:"PDF加水印云端处理",
+          alt: "PDF加水印云端处理",
           title: "云端加水印",
           text:
             "拥有多个PDF加水印云端服务器，支持批量在线PDF加水印，非常的方便快捷。"
         },
         {
           imgs: require("../assets/explain_5.png"),
-          alt:"PDF加水印温馨提示",
+          alt: "PDF加水印温馨提示",
           title: "温馨提示",
-          text:
-            "当转换过的PDF文件太大，不好传输或者发邮件？可使用“",
-            ahref:"PDF压缩",
-            ahrefs:"”进行文档压缩。",
-            urls:'https://www.pdf365.cn/pdf-compress'
+          text: "当转换过的PDF文件太大，不好传输或者发邮件？可使用“",
+          ahref: "PDF压缩",
+          ahrefs: "”进行文档压缩。",
+          urls: "https://www.pdf365.cn/pdf-compress"
         }
       ],
       //PDF转Word 使用攻略  模块
@@ -236,10 +235,10 @@ export default {
         }
       ],
       //热门功能  模块
-      hot_list: [],  
+      hot_list: [],
       //热门功能 底部模块
-      heards_c_lists: [], 
-      // 上传功能参数   
+      heards_c_lists: [],
+      // 上传功能参数
       options: {
         // target:this.,
         target: "https://www.pdf365.cn/v3Api/upload",
@@ -254,8 +253,8 @@ export default {
       //限制上传类型。 但是不是这边 在uploads
       attrs: {
         accept: "images/*"
-      }, 
-        // 上传功能参数
+      },
+      // 上传功能参数
       statusText: {
         success: "成功了",
         error: "出错了",
@@ -265,14 +264,14 @@ export default {
       },
       isNumberTen: 10, //true  列表上面已经有十个成功的文件 上传0个成功，还可以上传10个文件
       isFreesName: "", //只有免费跟公测  是 免费的图标
-      copyBbostlist:[]
+      copyBbostlist: []
     };
   },
 
   mounted() {
     const that = this;
     (window.onresize = () => {
-      return (() => { 
+      return (() => {
         that.isOverFlow = true;
         window.fullHeight = document.documentElement.clientHeight;
         that.windowHeight = window.fullHeight + "px";
@@ -296,9 +295,9 @@ export default {
     },
     fileComplete() {
       console.log("file complete", arguments);
-    }, 
+    },
     fileSuccess(rootFile, file, message, chunk) {
-      //上传单个文件成功  
+      //上传单个文件成功
       if (JSON.parse(message).data) {
         var price = {
           price: JSON.parse(message).data.filePrice,
@@ -311,22 +310,24 @@ export default {
       } else {
         var price = {
           noServe: true,
-          noServeMessage:JSON.parse(message).message
+          noServeMessage: JSON.parse(message).message
         };
       }
       Object.assign(file, price);
-       if (!JSON.parse(message).data) { 
-         var exceptionsList=this.copyBBostlist.filter(item=>(item.name||item.sieze))
-           this.copyBBostlist.map(function(item){
-               if(item.name==file.name&&item.sieze==file.sieze){
-                   item.noServe=true,
-                  item.noServeMessage=JSON.parse(message).message
-               }
-           })
-            this.$leoBus.$emit("exceptions", this.copyBBostlist );
-        }; 
-        
-        this.$leoBus.$emit("kes");
+      if (!JSON.parse(message).data) {
+        var exceptionsList = this.copyBBostlist.filter(
+          item => item.name || item.sieze
+        );
+        this.copyBBostlist.map(function(item) {
+          if (item.name == file.name && item.sieze == file.sieze) {
+            (item.noServe = true),
+              (item.noServeMessage = JSON.parse(message).message);
+          }
+        });
+        this.$leoBus.$emit("exceptions", this.copyBBostlist);
+      }
+
+      this.$leoBus.$emit("kes", this.$refs.uploader.uploader.files);
     },
     fileError(rootFile, file, message, chunk) {
       //上传失败
@@ -337,31 +338,43 @@ export default {
       };
       Object.assign(file, price);
       // console.log("complete", rootFile, file, message, chunk);
- var exceptionsList=this.copyBBostlist.filter(item=>(item.name||item.sieze))
-           this.copyBBostlist.map(function(item){
-               if(item.name==file.name&&item.sieze==file.sieze){
-                   item.noWeb=true,
-                  item.noWebMessage="网络无连接或请求超时,"
-               }
-           })
-            this.$leoBus.$emit("exceptions", this.copyBBostlist );  
+      var exceptionsList = this.copyBBostlist.filter(
+        item => item.name || item.sieze
+      );
+      this.copyBBostlist.map(function(item) {
+        if (item.name == file.name && item.sieze == file.sieze) {
+          (item.noWeb = true), (item.noWebMessage = "网络无连接或请求超时,");
+        }
+      });
+      this.$leoBus.$emit("exceptions", this.copyBBostlist);
     },
     open4(value) {
       this.$message.error(value);
     },
     adds(files, fileList) {
-      //上传文件 
+      //上传文件
       //  if(fileList.length>2){
       //    fileList= fileList.splice(0,2)
       //    files= files.splice(0,)
-      //  } 
-
-
-       if((files.filter(item=>item.fileType=="application/pdf").length!=files.length)){
-         
-              files.ignored = true;
-             this.open4("不支持该文件类型"); 
-       }else if (files.length == 0) {
+      //  }
+      var someList = [];
+      if (this.copyBBostlist) {
+        for (var k = 0, lens = fileList.length; k < lens; k++) {
+          someList = this.copyBBostlist.filter(
+            item => item.name == fileList[k].name
+          );
+        }
+      }
+      if (
+        files.filter(item => item.fileType == "application/pdf").length !=
+        files.length
+      ) {
+        files.ignored = true;
+        this.open4("不支持该文件类型");
+      } else if (files.length == 0) {
+        files.ignored = true;
+        this.open4("该文件已在列表中，不需要重复上传");
+      } else if (someList.length > 0) {
         files.ignored = true;
         this.open4("该文件已在列表中，不需要重复上传");
       } else if (files.length > 10) {
@@ -370,22 +383,18 @@ export default {
       } else if (files.length > this.isNumberTen) {
         files.ignored = true;
         var successNum = 10 - this.isNumberTen;
-        if(successNum==10){
-        this.open4(
-                  "成功上传" +
-                    successNum +
-                    "个文件，已达上限"
-                );
-        }else{
-           this.open4(
-          "已成功上传" +
-            successNum +
-            "个文件，只允许再上传" +
-            this.isNumberTen +
-            "个文件"
-        );
+        if (successNum == 10) {
+          this.open4("成功上传" + successNum + "个文件，已达上限");
+        } else {
+          this.open4(
+            "已成功上传" +
+              successNum +
+              "个文件，只允许再上传" +
+              this.isNumberTen +
+              "个文件"
+          );
         }
-      } else if (files.length != 0) {
+      }else if (files.length != 0) {
         var isTrue = false;
         files.map(function(item) {
           if (item.size > 104857600) {
@@ -396,12 +405,46 @@ export default {
           files.ignored = true;
           this.open4("最大支持100M文件处理，您可尝试压缩文档后重试");
         } else {
-          this.$leoBus.$emit("sums", files.length); //上传的总数
-          this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启置灰按钮   
+          this.$leoBus.$emit("sums", files.length); //上传的总数 
+          if (this.copyBBostlist) {
+            if(this.isNumberTen==10&&(this.copyBBostlist.length+files.length>10)){   //初始的时候， 第一次随机上传几个后，二次上传 需要考虑列表上面已有多少个文件， 如果累计不超过十个跳过
+                 files.ignored = true;
+                  this.open4(
+                    "已上传" +
+                      this.copyBBostlist.length +
+                      "个文件，只允许再上传" +
+                       (10-this.copyBBostlist.length) +
+                      "个文件"
+                  );
+            }else if (this.isNumberTen==10&&(this.copyBBostlist.length+files.length==10)){          //初始的时候， 第一次随机上传几个后，二次上传 需要考虑列表上面已有多少个文件，如果刚好十个进入。少于10跳过        
+                   this.$leoBus.$emit("btnSarting_btnSarted")
+            }else if(this.isNumberTen!=10&&files.length>(10-(this.copyBBostlist.length-(this.copyBBostlist.filter(item=>item.noWeb).length)-(this.copyBBostlist.filter(item=>item.noServe).length)))){              //初始的时候。第一次随机上传几个后，二次上传 如果列表有成功，有异常，  需要考虑除列表成功后还可以上传几个文件，  累计超过十个 就会进入，不超过 跳掉
+                files.ignored = true;
+                  this.open4(
+                    "已上传" +
+                     (this.copyBBostlist.length-(this.copyBBostlist.filter(item=>item.noWeb).length)-(this.copyBBostlist.filter(item=>item.noServe).length)) +
+                      "个文件，只允许再上传" +
+                       (10-(this.copyBBostlist.length-(this.copyBBostlist.filter(item=>item.noWeb).length)-(this.copyBBostlist.filter(item=>item.noServe).length))) +
+                      "个文件"
+                  );
+
+            }else if(this.isNumberTen!=10&&(this.copyBBostlist.length-(this.copyBBostlist.filter(item=>item.noWeb).length)-(this.copyBBostlist.filter(item=>item.noServe).length))+files.length==10){                   //初始的时候。第一次随机上传几个后，二次上传 如果列表有成功，有异常，  需要考虑除列表成功后还可以上传几个文件，  刚好10个，不超过 
+              // (((this.copyBBostlist.filter(item=>item.noServe).length)+(this.copyBBostlist.filter(item=>item.noWeb).length)+(this.copyBBostlist.filter(item=>item.price).length)+files.length)==10)
+                 this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启置灰按钮 
+            }
+            //  if((this.copyBBostlist.length+files.length)>=10){
+            //     this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启置灰按钮
+            //  }
+          }else{
+            if(files.length==10){
+                this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启置灰按钮
+            }
+            //  this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启置灰按钮
+          }
           this.$leoBus.$emit("isUploadsOver"); //监听列表是有文件再上传中
         }
       }
-    }, 
+    },
     //获取菜单栏信息
     getAllData() {
       var that = this;
@@ -449,7 +492,8 @@ export default {
           ]; //底部的导航内容
         }
       });
-      $.ajax({    //使用攻略
+      $.ajax({
+        //使用攻略
         type: "get",
         url: "https://www.pdf365.cn/v3Api/getFaqList",
         data: {
@@ -460,7 +504,7 @@ export default {
         }
       });
     }
-  }, 
+  },
   created() {
     var that = this;
     //屏幕高度
@@ -468,14 +512,13 @@ export default {
     that.windowHeight = window.fullHeight + "px";
     //初始化菜单栏信息
     this.getAllData();
-    this.$leoBus.$on("user_info", params => { 
+    this.$leoBus.$on("user_info", params => {
       //传递用户的id
       that.options.query.userIds = params.userId;
-      
     });
-     this.$leoBus.$on("copyBBostlist", params => {
+    this.$leoBus.$on("copyBBostlist", params => {
       //监听功能是否有免费的
-      that.copyBBostlist=params
+      that.copyBBostlist = params; 
     });
     this.$leoBus.$on("free_big", params => {
       //监听功能是否有免费的
@@ -496,7 +539,7 @@ export default {
     this.$leoBus.$on("ModalisMask", () => {
       //打开背景
       that.isMark = true;
-    });    
+    });
     this.$leoBus.$on("fileLists", params => {
       //判断是选择页面 还是功能列表页面
       if (params) {
@@ -504,9 +547,9 @@ export default {
       } else {
         that.isFileList = true;
       }
-    }); 
+    });
   },
-  components: { 
+  components: {
     "m-heards": heards,
     "m-footers": Mfooters,
     "m-abouts": Mabouts,
@@ -760,11 +803,11 @@ export default {
             text-align: left;
             padding: 0 22px 0 32px;
             line-height: 24px;
-            a{
-               color: #999;
+            a {
+              color: #999;
             }
-            a:hover{
-              color:#ff8e67
+            a:hover {
+              color: #ff8e67;
             }
           }
         }

@@ -49,7 +49,7 @@
                   <img class="user_imgs" :src="figure?figure:figures" />
                   <span class="user_names" >{{user_Name}}</span>
                   <div class="direction_log" style="   "><img class="direction_tips" :src="isMove?small_up:small_down" ></div>
-                   <!-- -->
+                   <!--  -->
                   <div class="user_message_list"  v-show="isMove" > 
                      <div class="user_info" >
                           <a class="user_info_img"  href="http://vip.foxitreader.cn/userCenter" target="_blank">
@@ -79,7 +79,7 @@
                            <a  href="https://sso.foxitreader.cn/forgot" target="_blank" rel="nofollow"   >修改密码</a>
                          </li>
                          <li > 
-                           <a href="/logout"   class="row-1" rel="nofollow"  @click="logOut">退出</a>
+                           <a href="JavaScript:;"   class="row-1" rel="nofollow"  @click="logOut">退出</a>
                          </li>
                        </ul>
                      </div>
@@ -259,6 +259,8 @@ export default {
     //退出登入
     logOut() {
       sessionStorage.clear() 
+      this.$leoBus.$emit("logout");
+      window.open("/logout","_self")
     },
     ToLogin() {
       // var url = window.location.href;  encodeURI   encodeURIComponent
@@ -615,7 +617,7 @@ export default {
             li {
               overflow: hidden;
               cursor: default;
-              line-height: 34px;
+              line-height: 26px;
               a {
                 width: 68px;
                 text-indent: 13px;
@@ -623,6 +625,9 @@ export default {
                 display: inline-block;
                 cursor: pointer;
                 color: #555;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis
               }
             }
           }

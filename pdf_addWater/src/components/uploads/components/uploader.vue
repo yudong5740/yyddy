@@ -2,14 +2,14 @@
   <div class="uploader">
     <slot :files="files" :file-list="fileList" :started="started">
       <uploader-unsupport></uploader-unsupport>
-     <div   class="uploader-examples" v-if='isFileList'>
+     <div   class="uploader-examples" v-show='isFileList'>
         <img class=" free_big" :src="free_big[free_big_name]" alt="免费" v-if="free_big_name&&free_big[free_big_name]">
         <div class="choice_icon">
           <img src="../../../assets/addWater.png" alt="PDF加水印">
         </div>
-        <template v-if="isdrop">
+        <template >
           <!-- <p>Drop files here to upload or</p> -->
-          <uploader-btn class="Choice_img"  :attrs="attrs" >选择文件</uploader-btn>
+          <uploader-btn class="Choice_img"  :attrs="attrs"  v-show="isdrop">选择文件</uploader-btn>
           <!-- <uploader-btn>select files1111</uploader-btn>
           <uploader-btn :directory="true">select folder111</uploader-btn> -->
         </template>
@@ -33,9 +33,9 @@
                   <div  class="btnSarting_btnSarted" >+添加文件</div>
               </template>
                <!-- btnSarting_btnSarts  上传后开启-->
-              <template v-if="btnSarting_btnSarts">
-                   <uploader-btn    style="position: absolute;width: 118px;height: 40px;right:1px;top:-116px;text-align: center;line-height: 40px;font-size: 12px;color: #ff6833;border: 1px solid #ff6833;border-radius: 5px;cursor: pointer;padding:0" :style="{background:bg}"  :attrs="attrs" >+ 添加文件</uploader-btn>
-              </template> 
+             
+                   <uploader-btn    style="position: absolute;width: 118px;height: 40px;right:1px;top:-116px;text-align: center;line-height: 40px;font-size: 12px;color: #ff6833;border: 1px solid #ff6833;border-radius: 5px;cursor: pointer;padding:0" :style="{background:bg}"  :attrs="attrs" v-show="btnSarting_btnSarts">+ 添加文件</uploader-btn>
+             
             </template>  
                 <!-- 转换完成后开启 btnSarted-->
             <template v-if='btnSarted'>
@@ -104,7 +104,7 @@ export default {
   },
   data() {
     return {
-      isFileList: false, //控制选择页面的选择按钮
+      isFileList: true, //控制选择页面的选择按钮
       btnSarting_btnSarted:false,   //上传中
       btnSarting_btnSarts:true,   //开始上传前后
       started: false,
@@ -181,28 +181,28 @@ export default {
     fileList: {
       handler: function(newVal) {
         //监听是选择页面 还是功能列表页面
-        this.$leoBus.$emit("boxlist", newVal);
-        if (newVal.length > 0) {
-          this.$leoBus.$emit("fileLists", true);
-          this.isFileList = false;
-        } else {
-          this.$leoBus.$emit("fileLists", false);
-          this.isFileList = true;
-        }
+        this.$leoBus.$emit("boxlist", newVal); 
       },
       deep: true
     }
   },
   created() {
     var that = this;
-    
+     this.$leoBus.$on("fileLists", params => {
+      //判断是选择页面 还是功能列表页面
+      if (params) {
+       this.isFileList = false;
+      } else {
+        this.isFileList = true;
+      }
+    }); 
     this.$leoBus.$on("btnSarting_btnSarted", () => {
       //上传中开启  置灰按钮
       that.btnSarting_btnSarted = true;
       that.btnSarting_btnSarts = false; 
     });
     this.$leoBus.$on("btnSarting_btnSarts", () => {
-      //上传中开启 上传按钮
+      //上传后开启 上传按钮
       that.btnSarting_btnSarted = false;
       that.btnSarting_btnSarts = true; 
     });
