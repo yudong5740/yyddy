@@ -333,6 +333,7 @@ export default {
       //上传失败
       // this.uploadFile.push(file);
       // this.$leoBus.$emit("uploadFile", this.uploadFile);
+      //  网络断网或者服务器重启
       var price = {
         noWeb: true
       };
@@ -365,18 +366,37 @@ export default {
           );
         }
       }
+      // alert(JSON.stringify(files[0]))
+      //   var vcolorpicker
+      //   var isType=false
+      //  if (!!window.ActiveXObject || "ActiveXObject" in window){
+           
+      //          isType
+      //  } else{
+        
+      // }
+        //  var list=  files.filter( function(item){
+        //       return 
+        //    })
+        // alert(list.length)
+        //     files.ignored = true; 
       if (
-        files.filter(item => item.fileType == "application/pdf").length !=
+        files.filter(item => (item.fileType == "application/pdf"||(files[0].uniqueIdentifier).substr(files[0].uniqueIdentifier.length-3)=="pdf")).length !=
         files.length
       ) {
         files.ignored = true;
         this.open4("不支持该文件类型");
       } else if (files.length == 0) {
-        files.ignored = true;
-        this.open4("该文件已在列表中，不需要重复上传");
-      } else if (someList.length > 0) {
-        files.ignored = true;
-        this.open4("该文件已在列表中，不需要重复上传");
+          this.open4("该文件已在列表中，不需要重复上传或该文件内容为空");
+    //     files.ignored = true;
+    //  if(JSON.stringify(files)=="[]"){
+    // this.open4("");
+    //     }else{
+ 
+    //     } 
+      } else if (someList.length > 0) { 
+         files.ignored = true;
+         this.open4("该文件已在列表中，不需要重复上传");
       } else if (files.length > 10) {
         files.ignored = true;
         this.open4("一次上传最多支持10个文件");
@@ -405,7 +425,7 @@ export default {
           files.ignored = true;
           this.open4("最大支持100M文件处理，您可尝试压缩文档后重试");
         } else {
-          this.$leoBus.$emit("sums", files.length); //上传的总数 
+       
           if (this.copyBBostlist) {
             if(this.isNumberTen==10&&(this.copyBBostlist.length+files.length>10)){   //初始的时候， 第一次随机上传几个后，二次上传 需要考虑列表上面已有多少个文件， 如果累计不超过十个跳过
                  files.ignored = true;
@@ -416,8 +436,13 @@ export default {
                        (10-this.copyBBostlist.length) +
                       "个文件"
                   );
-            }else if (this.isNumberTen==10&&(this.copyBBostlist.length+files.length==10)){          //初始的时候， 第一次随机上传几个后，二次上传 需要考虑列表上面已有多少个文件，如果刚好十个进入。少于10跳过        
+            }else if (this.isNumberTen==10&&(this.copyBBostlist.length+files.length==10)){          //初始的时候， 第一次随机上传几个后，二次上传 需要考虑列表上面已有多少个文件，如果刚好十个进入。少于10跳过   
+              this.$leoBus.$emit("isUploadsOver"); //监听列表是有文件再上传中
+              this.$leoBus.$emit("sums", files.length); //上传的总数      
                    this.$leoBus.$emit("btnSarting_btnSarted")
+            }else if(this.isNumberTen==10&&(this.copyBBostlist.length+files.length<10)){
+                this.$leoBus.$emit("isUploadsOver"); //监听列表是有文件再上传中
+              this.$leoBus.$emit("sums", files.length); //上传的总数      
             }else if(this.isNumberTen!=10&&files.length>(10-(this.copyBBostlist.length-(this.copyBBostlist.filter(item=>item.noWeb).length)-(this.copyBBostlist.filter(item=>item.noServe).length)))){              //初始的时候。第一次随机上传几个后，二次上传 如果列表有成功，有异常，  需要考虑除列表成功后还可以上传几个文件，  累计超过十个 就会进入，不超过 跳掉
                 files.ignored = true;
                   this.open4(
@@ -430,18 +455,21 @@ export default {
 
             }else if(this.isNumberTen!=10&&(this.copyBBostlist.length-(this.copyBBostlist.filter(item=>item.noWeb).length)-(this.copyBBostlist.filter(item=>item.noServe).length))+files.length==10){                   //初始的时候。第一次随机上传几个后，二次上传 如果列表有成功，有异常，  需要考虑除列表成功后还可以上传几个文件，  刚好10个，不超过 
               // (((this.copyBBostlist.filter(item=>item.noServe).length)+(this.copyBBostlist.filter(item=>item.noWeb).length)+(this.copyBBostlist.filter(item=>item.price).length)+files.length)==10)
+               this.$leoBus.$emit("isUploadsOver"); //监听列表是有文件再上传中
+               this.$leoBus.$emit("sums", files.length); //上传的总数 
                  this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启置灰按钮 
-            }
-            //  if((this.copyBBostlist.length+files.length)>=10){
-            //     this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启置灰按钮
-            //  }
-          }else{
+            }else if (this.isNumberTen!=10&&(this.copyBBostlist.length-(this.copyBBostlist.filter(item=>item.noWeb).length)-(this.copyBBostlist.filter(item=>item.noServe).length))+files.length<10){
+                this.$leoBus.$emit("isUploadsOver"); //监听列表是有文件再上传中
+               this.$leoBus.$emit("sums", files.length); //上传的总数 
+            } 
+          }else{ 
+            this.$leoBus.$emit("isUploadsOver"); //监听列表是有文件再上传中
+            this.$leoBus.$emit("sums", files.length); //上传的总数 
             if(files.length==10){
                 this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启置灰按钮
-            }
-            //  this.$leoBus.$emit("btnSarting_btnSarted"); //上传中开启置灰按钮
+            }  
           }
-          this.$leoBus.$emit("isUploadsOver"); //监听列表是有文件再上传中
+           
         }
       }
     },

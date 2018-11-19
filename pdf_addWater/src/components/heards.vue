@@ -263,7 +263,7 @@ export default {
       window.open("/logout","_self")
     },
     ToLogin() {
-      // var url = window.location.href;  encodeURI   encodeURIComponent
+      // var url = window.location.href;  encodeURI   encodeURIComponent  http://vip.foxitreader.cn
       var url = window.location.href;
       window.location.href = "/userLogin?url=" + encodeURIComponent(url);
     },
@@ -347,6 +347,9 @@ export default {
           width: 120px;
           height: 120px;
           cursor: pointer;
+          img{
+            border: none
+          }
         }
       }
     }

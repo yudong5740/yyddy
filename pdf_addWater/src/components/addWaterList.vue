@@ -34,7 +34,8 @@
                  <template v-else> 
                     <i class="el-icon-delate_success"></i>
                     <span  class="Processing_delate_success">
-                       当前成功处理文件{{delatedNum}}个<template v-if="!isFree">，已消耗{{delated_blance}}额度，剩余<template v-if="balance_total_Blance !=0">{{balance_total_Blance}}</template><template v-else-if="(balance_total-delated_blance)<0||(balance_total-delated_blance)==0">0</template><template v-else>{{balance_total-delated_blance}}</template>额度，<a href="http://vip.foxitreader.cn/pdf365/pdf365_pay" target="_blank" >立即充值</a></template>
+                       <!-- 当前成功处理文件{{delatedNum}}个<template v-if="!isFree">，已消耗{{delated_blance}}额度，剩余<template v-if="balance_total_Blance !=0">{{balance_total_Blance}}</template><template v-else-if="(balance_total-delated_blance)<0||(balance_total-delated_blance)==0">0</template><template v-else>{{balance_total-delated_blance}}</template>额度，<a href="http://vip.foxitreader.cn/pdf365/pdf365_pay" target="_blank" >立即充值</a></template> -->
+                            当前成功处理文件{{delatedNum}}个<template v-if="!isFree">，已消耗{{delated_blance}}额度，<a href="http://vip.foxitreader.cn/pdf365/pdf365_pay" target="_blank" >立即充值</a></template>
                     </span> 
                  </template> 
              </template>
@@ -109,7 +110,7 @@
                       </template>
                       <template v-else>
                           <template v-if="item.noWeb">
-                            <span class="noWeb">{{item.noWebMessage}}<span @click="retry(index)" >请重试</span></span>
+                            <span class="noWeb">{{item.noWebMessage}}<span @click="retry(index,item)" >请重试</span></span>
                           </template>
                           <template v-else-if="item.singleComplete||item.noServe">
                             <!-- <span>服务异常，请联系客服或重试{{item.noServe}},{{item.status}},{{item.singleComplete}},</span> -->
@@ -139,7 +140,7 @@
                 <template v-else> 
                     <template v-if="item.index_u==4">
                           <template  v-if="item.url_d!='NoBalance'"> 
-                         <span><a :href="item.url_d" >下载</a></span>
+                         <span><a href="javascript:;"  @click="onDown(item.url_d)">下载</a></span>
                       </template>
                       <template v-else>
                          <span><a   href="JavaScript:;" @click="delates(index,'删除')">删除</a></span>
@@ -202,19 +203,20 @@
         <div class="Water_types">
           <span class="title">类型:</span>
           <template v-if="changesOver">
+             <!-- :class="{OnAcitve:isOnFont}"    :class="{OnAcitve:!isOnFont}"-->
               <label>
-                <input type="radio" name="radios" value="1" :checked="isOnFont"   @click="checks(1)"/> <span  :class="{OnAcitve:isOnFont}">文字</span>
+                <input type="radio" name="radios" value="1" :checked="isOnFont"   @click="checks(1)"/> <span >文字</span>
               </label>
               <label>
-                <input type="radio" name="radios" value="2"   :checked="!isOnFont"   @click="checks(2)"/> <span :class="{OnAcitve:!isOnFont}">图片</span>
+                <input type="radio" name="radios" value="2"   :checked="!isOnFont"   @click="checks(2)"/> <span >图片</span>
               </label>
           </template>
           <template v-else>
               <label  style="cursor: not-allowed">
-                <input type="radio" name="radios" value="1" :checked="isOnFont"   @click="checks(1)"  disabled/> <span  :class="{OnAcitve:isOnFont}">文字</span>
+                <input type="radio" name="radios" value="1" :checked="isOnFont"   @click="checks(1)"  disabled/> <span  >文字</span>
               </label>
               <label style="cursor: not-allowed">
-                <input type="radio" name="radios" value="2"  :checked="!isOnFont"     @click="checks(2)" disabled /> <span :class="{OnAcitve:!isOnFont}">图片</span>
+                <input type="radio" name="radios" value="2"  :checked="!isOnFont"     @click="checks(2)" disabled /> <span >图片</span>
               </label>
           </template>
         </div>
@@ -244,9 +246,10 @@
               <!-- @blur="fontSizeBlur" -->
             </template>
             <template v-else>
-              <input  disabled type="text" class="inputText actices" :class="{acticess:inputTextSize}"  v-model="fontSize" @mouseenter="mouseEnters('inputTextSize')" @mouseleave="mouseLeaves('inputTextSize')" style="cursor: not-allowed">
+              <input  disabled type="text" class="inputText actices changesOver" :class="{acticess:inputTextSize}"  v-model="fontSize" @mouseenter="mouseEnters('inputTextSize')" @mouseleave="mouseLeaves('inputTextSize')" style="cursor: not-allowed">
             </template>
-            <div class="unit">pt</div>
+            <div class="unit"  v-if="changesOver">pt</div>
+            <div class="unit changesOver"   v-else>pt</div>
             <div class="bgColorS">
               <template v-if="changesOver">
                 <m-selects_color :itemList='colorList'  :message='colorListSure.colorMessage' @selectOk="colorSelect"></m-selects_color>
@@ -262,7 +265,7 @@
           </div>
         </div>
          <!-- v-show="!isOnFont" -->
-        <div v-show="!isOnFont" >
+        <div   v-show="!isOnFont">
           <div class="upImg">
             <span class="title">上传图片:</span>
             <template v-if="changesOver">
@@ -319,18 +322,19 @@
           <span class="title">放置层:</span>
           <template v-if="changesOver">
             <label>
-              <input type="radio" name="radio" value="1"    :checked="isOnPlace"  @click="placeW(1)"/> <span  :class="{OnAcitve:isOnPlace}">PDF文字内容上方</span>
+              <!-- :class="{OnAcitve:isOnPlace}"    :class="{OnAcitve:!isOnPlace}"-->
+              <input type="radio" name="radio" value="1"    :checked="isOnPlace"  @click="placeW(1)"/> <span  >PDF文字内容上方</span>
             </label>
             <label>
-              <input type="radio" name="radio" value="2"   :checked="!isOnPlace"   @click="placeW(2)"/> <span   :class="{OnAcitve:!isOnPlace}">PDF文字内容下方</span>
+              <input type="radio" name="radio" value="2"   :checked="!isOnPlace"   @click="placeW(2)"/> <span >PDF文字内容下方</span>
             </label>
           </template>
           <template v-else>
             <label style="cursor: not-allowed">
-              <input type="radio" name="radio" value="1"   :checked="isOnPlace"  @click="placeW(1)" disabled/> <span  :class="{OnAcitve:isOnPlace}">PDF文字内容上方</span>
+              <input type="radio" name="radio" value="1"   :checked="isOnPlace"  @click="placeW(1)" disabled/> <span  >PDF文字内容上方</span>
             </label>
             <label style="cursor: not-allowed">
-              <input type="radio" name="radio" value="2"    :checked="!isOnPlace"  @click="placeW(2)"  disabled/> <span   :class="{OnAcitve:!isOnPlace}">PDF文字内容下方</span>
+              <input type="radio" name="radio" value="2"    :checked="!isOnPlace"  @click="placeW(2)"  disabled/> <span >PDF文字内容下方</span>
             </label>
           </template>
         </div>
@@ -344,20 +348,7 @@
             </template>
             <template v-else>
                  <div class="btnStart"   >立即开始</div>
-            </template>
-
-            <!-- <template v-if="changesOver">
-              <template v-if='!isBtnStartChanges'>
-                <div class="btnStart"   >立即开始</div>
-              </template>
-              <template v-else>
-                  <div class="btnStart" :class="{active:isBtnStartChanges}"  @click="btnStart">立即开始</div>
-              </template>
-            </template>
-            <template v-else>
-                <div class="btnStart" >立即开始</div>
-            </template> -->
-
+            </template>  
        </template>
       </div> 
       <!-- 额度弹窗 -->
@@ -784,7 +775,9 @@ export default {
       getTimeList: [], //定时器个数存储
       getTimeListBlance: [], //处理成功 额度不足 定时器个数存储
       isFree: true, // 整个功能是否免费   如果免费就没有关于额度任何的东西
-      storagelistLong: 0 //storage 的列表存储长度
+      storagelistLong: 0, //storage 的列表存储长度
+      userBlance:0, 
+      onDownloads:false
     };
   },
   watch: {
@@ -889,18 +882,23 @@ export default {
       }
     }
   },
-  created() {
+  created() {  
     var that = this;
     this.getUserInfo();
     this.getTypeInfo();
-    window.onbeforeunload = function() {
-      if (that.uploadsOver) {
+    window.onbeforeunload = function() {  
+       if(that.onDownloads){
+            setTimeout(function(){
+              that.onDownloads=false
+            },300)
+       }else if (that.uploadsOver) {
         setTimeout(function() {
           that.logout = true;
           that.setStorage();
         }, 500);
         return "刷新当前页，正在上传的文件将无法保存，请确认！";
       }
+    
     };
 
     if (
@@ -923,9 +921,13 @@ export default {
       this.fontSize = item.fontSize;
       this.textContent = item.textContent;
       this.isBtnStartChanges = item.isBtnStartChanges;
-      this.allComplete = item.allComplete;
-      this.key = item.key;
-      this.sum = item.sum;
+      this.allComplete = true;
+      this.key = item.storagelist.filter(
+        items => items.price
+      ).length;
+      this.sum = item.storagelist.filter(
+        items => items.price
+      ).length;
       this.isLogings = item.isLogings;
       this.consume_balance = item.consume_balance;
       this.fileLists = item.fileLists;
@@ -1072,6 +1074,10 @@ export default {
     // });
   },
   methods: {
+    onDown(url){
+      this.onDownloads=true
+      window.location.href=url
+    }, 
     setStorage() {
       if (!this.isDelates) {
         if (this.logout) {
@@ -1185,7 +1191,7 @@ export default {
       } else if ((value > 1024 || value == 1024) && value < 1048576) {
         return (value / 1024).toFixed(0) + " KB";
       } else if (value > 1048576 || value == 1048576) {
-        return (value / 1048576).toFixed(1) + " MB";
+        return (value / 1048576).toFixed(2) + " MB";
       }
     },
     //删除列表
@@ -1232,22 +1238,27 @@ export default {
       if (this.bbostlist.filter(item => item.price).length == 10) {
         this.tips("一次上传最多支持10个文件");
       } else {
-        this.$leoBus.$emit("retryss", num);
+         var list=[]
+         this.bbostlist[num].noWeb=false
+         list=this.bbostlist
+         this.bbostlist=[]
+         this.bbostlist=list
+         this.$leoBus.$emit("retryss", num);
       }
-    },
+    }, 
     //用户信息数据
     //获取用户信息
     getUserInfo() {
-      // alert("刷新了")
+      // alert("刷新了") 
       var that = this;
       $.ajax({
         type: "get",
-        url: "https://www.pdf365.cn/v3Api/getUserInfo",
+        url: "https://www.pdf365.cn/v3Api/getUserInfo?num="+Math.random(),
         xhrFields: {
           withCredentials: true // 携带跨域cookie
         },
         success: function(data) {
-          if (data.httpStatus == 200 && !data.code&&data.data) {
+          if (data.httpStatus == 200 && !data.code&&data.success) {
             //"{"data":{"figure":"","balance":"6358.0","nickName":"娟玲","userType":"v1","userId":"900035423","isVip":false},"httpStatus":200,"success":true}"
 
             that.balance_total = data.data.balance;
@@ -1256,7 +1267,7 @@ export default {
             that.$leoBus.$emit("user_info", data.data);
             that.isLogings = true;
           }else{
-            // alert(data.data.message+"检测登入")
+            // alert(data.message+"检测登入")
           }
         },
         error:function(){
@@ -1269,7 +1280,7 @@ export default {
       var that = this;
       $.ajax({
         type: "get",
-        url: "https://www.pdf365.cn/v3Api/getTypeInfo",
+        url: "https://www.pdf365.cn/v3Api/getTypeInfo?num="+Math.random(),
         data: {
           type: "watermark" //类型
         },
@@ -1365,8 +1376,7 @@ export default {
             if (numlists == that.ResultList.length - 1) {
               that.ResultList[numlists].index_u = 1;
               that.ResultList[numlists].message_y = data.message;
-              that.numlists = 0;
-              that.ToOrder(numlists);
+              that.numlists = 0; 
               if (that.ResultNumList.length > 0) {
                 that.btnTask(that.numlists);
               } else {
@@ -1462,7 +1472,7 @@ export default {
                       that.ResultList[that.ResultNumList[e]].docid,
                       that.ResultList[that.ResultNumList[e]].jobId_d
                     );
-                  }, 1000);
+                  }, 5000);
                 })(k);
                 var obj = {};
                 obj[that.ResultList[that.ResultNumList[k]].docid] =
@@ -1479,11 +1489,12 @@ export default {
               that.btnTask(numlists);
             }
           } else {
-            if (numlists == that.ResultNumList.length - 1) {
+            if (numlists == (that.ResultNumList.length - 1)) {
               that.ResultList[that.ResultNumList[numlists]].index_u = 1;
               that.ResultList[that.ResultNumList[numlists]].message_y =
                 data.message;
-              that.numlists = 0;
+              that.numlists = 0; 
+              var setTimeList = [];
               if (that.lastList.length > 0) {
                 for (
                   var k = 0, lens = that.ResultNumList.length;
@@ -1497,7 +1508,7 @@ export default {
                         that.ResultList[that.ResultNumList[e]].docid,
                         that.ResultList[that.ResultNumList[e]].jobId_d
                       );
-                    }, 1000);
+                    }, 5000);
                   })(k);
                   var obj = {};
                   obj[that.ResultList[that.ResultNumList[k]].docid] =
@@ -1528,6 +1539,8 @@ export default {
                 "网络无连接或请求超时";
               that.numlists = 0;
               if (that.lastList.length > 0) {
+                
+              var setTimeList = [];
                 for (
                   var k = 0, lens = that.ResultNumList.length;
                   k < lens;
@@ -1571,7 +1584,7 @@ export default {
       //查询接口
       $.ajax({
         type: "get",
-        url: "https://www.pdf365.cn/v3Api/queryTask",
+        url: "https://www.pdf365.cn/v3Api/queryTask?num="+Math.random(),
         xhrFields: {
           withCredentials: true // 携带跨域cookie
         },
@@ -1592,7 +1605,7 @@ export default {
                     item.url_d = data.data.downloadUrl;
                     item.index_u = 4;
                   } else {
-                    that.delated_blance = that.delated_blance + item.price;
+                    // that.delated_blance = that.delated_blance + item.price;
                     item.url_d = "NoBalance";
                     item.index_u = 4;
                   }
@@ -1630,7 +1643,7 @@ export default {
               clearInterval(clearList[0][docid]);
               var numsEr = that.ResultList.filter(item => item.index_u == 1);
               var numsSu = that.ResultList.filter(item => item.index_u == 4);
-              if (numsEr.length + numsSu.length == that.lastList.length) {
+              if ((numsEr.length + numsSu.length) == that.lastList.length) {
                 that.$leoBus.$emit("btnSarted"); //结束转换
                 that.getTimeList = []; //所有时间定时器数组
                 that.delateing = false; //  处理中结束    处理结果出来
@@ -1638,7 +1651,7 @@ export default {
                 that.uploadsOver = false; //监听列表有文件上传
               }
             }
-          } else {
+          } else {   
             that.ResultList.map(function(item) {
               if (item.docid == docid) {
                 item.message_y = "转换失败【服务异常，请联系客服】";
@@ -1646,12 +1659,12 @@ export default {
               }
             });
             that.bbostlist = [];
-            that.bbostlist = that.ResultList;
-            var clearList = that.getTimeList.filter(item => item[docid]);
-            clearInterval(clearList[0][docid]);
+            that.bbostlist = that.ResultList; 
             var numsEr = that.ResultList.filter(item => item.index_u == 1);
             var numsSu = that.ResultList.filter(item => item.index_u == 4);
-            if (numsEr.length + numsSu.length == that.lastList.length) {
+            if ((numsEr.length + numsSu.length) == that.lastList.length) {
+            //    var clearList = that.getTimeList.filter(item => item[docid]);
+            // clearInterval(clearList[0][docid]);
               that.$leoBus.$emit("btnSarted"); //结束转换
               that.getTimeList = []; //所有时间定时器数组
               that.delateing = false; //  处理中结束    处理结果出来
@@ -1670,11 +1683,14 @@ export default {
             });
             that.bbostlist = [];
             that.bbostlist = that.ResultList;
-            var clearList = that.getTimeList.filter(item => item[docid]);
-            clearInterval(clearList[0][docid]);
+          
             var numsEr = that.ResultList.filter(item => item.index_u == 1);
             var numsSu = that.ResultList.filter(item => item.index_u == 4);
             if (numsEr.length + numsSu.length == that.lastList.length) {
+                var clearList = that.getTimeList.filter(item => item[docid]);
+            if(clearList.length){
+               clearInterval(clearList[0][docid]);
+            }
               that.$leoBus.$emit("btnSarted"); //结束转换
               that.getTimeList = []; //所有时间定时器数组
               that.delateing = false; //  处理中结束    处理结果出来
@@ -1695,7 +1711,7 @@ export default {
       that.bbostlist = that.ResultList;
       $.ajax({
         type: "get",
-        url: "https://www.pdf365.cn/v3Api/getUserInfo",
+        url: "https://www.pdf365.cn/v3Api/getUserInfo?num="+Math.random(),
         xhrFields: {
           withCredentials: true // 携带跨域cookie
         },
@@ -1740,7 +1756,7 @@ export default {
       //查询接口
       $.ajax({
         type: "get",
-        url: "https://www.pdf365.cn/v3Api/queryTask",
+        url: "https://www.pdf365.cn/v3Api/queryTask?num="+Math.random(),
         xhrFields: {
           withCredentials: true // 携带跨域cookie
         },
@@ -1756,6 +1772,7 @@ export default {
               that.ResultList.map(function(item) {
                 if (item.docid == daocidData) {
                   if (data.data.balanceStatus == "success") {
+                    that.delated_blance=that.delated_blance+data.data.filePrice
                     that.balance_total_Blance =
                       Number(that.balance_total_Blance) -
                       Number(data.data.filePrice);
@@ -1796,12 +1813,12 @@ export default {
               });
               that.bbostlist = [];
               that.bbostlist = that.ResultList;
-              var clearList = that.getTimeListBlance.filter(
+                var clearList = that.getTimeListBlance.filter(
                 item => item[docid]
               );
               clearInterval(clearList[0][docid]);
               var nums = that.ResultList.filter(item => item.index_u == 4);
-              if (nums.length == that.lastList.length) {
+              if (nums.length == that.lastList.length) { 
                 that.$leoBus.$emit("btnSarted"); //结束转换
                 that.delateing = false; //  处理中结束    处理结果出来
                 that.changesOver = false; //处理结束后 开启水印内容置灰按钮
@@ -1816,11 +1833,11 @@ export default {
               }
             });
             that.bbostlist = [];
-            that.bbostlist = that.ResultList;
-            var clearList = that.getTimeList.filter(item => item[docid]);
-            clearInterval(clearList[0][docid]);
+            that.bbostlist = that.ResultList; 
             var nums = that.ResultList.filter(item => item.index_u);
             if (nums.length == that.lastList.length) {
+                   var clearList = that.getTimeList.filter(item => item[docid]);
+            clearInterval(clearList[0][docid]);
               that.$leoBus.$emit("btnSarted"); //结束转换
               that.delateing = false; //  处理中结束    处理结果出来
               that.changesOver = false; //处理结束后 开启水印内容置灰按钮
@@ -1838,11 +1855,12 @@ export default {
             });
             that.bbostlist = [];
             that.bbostlist = that.ResultList;
-            var clearList = that.getTimeList.filter(item => item[docid]);
-            clearInterval(clearList[0][docid]);
+        
             var numsEr = that.ResultList.filter(item => item.index_u == 1);
             var numsSu = that.ResultList.filter(item => item.index_u == 4);
             if (numsEr.length + numsSu.length == that.lastList.length) {
+                  var clearList = that.getTimeList.filter(item => item[docid]);
+            clearInterval(clearList[0][docid]);
               that.$leoBus.$emit("btnSarted"); //结束转换
               that.getTimeList = []; //所有时间定时器数组
               that.delateing = false; //  处理中结束    处理结果出来
@@ -2153,8 +2171,7 @@ export default {
         padding: 8px;
         border: 1px solid #d2d2d2;
         outline: none;
-        border-radius: 2px;
-        overflow: hidden;
+        border-radius: 2px; 
         font-size: 12px;
       }
       .changesOver {
@@ -2265,6 +2282,18 @@ export default {
           top: -1px;
           left: -5px;
         }
+          .unit.changesOver {
+          display: inline-block;
+          width: 37px;
+          height: 31px;
+          background: #dddddd;
+          color: #666666;
+          line-height: 30px;
+          text-align: center;
+          position: relative;
+          top: -1px;
+          left: -5px;
+        }
         .inputText {
           color: #333333;
           width: 40px;
@@ -2276,8 +2305,21 @@ export default {
           border: 1px solid #378888;
           border-color: #d2d2d2;
           border-right: none;
-          top: 1px;
+          top: -1px;
         }
+        .inputText.changesOver {
+          color: #333333;
+          width: 40px;
+          height: 27px;
+          border-radius: 2px;
+          position: relative;
+          line-height: 29px;
+          text-align: center;
+          border: 1px solid #378888;
+          border-color: #d2d2d2;
+          border-right: none;
+          top: 0px;
+        } 
       }
       .bgColorS {
         display: inline-block;
@@ -2297,7 +2339,7 @@ export default {
           border: 0.5px solid rgb(210, 210, 210);
           position: relative;
           text-indent: 10px;
-          top: 5px;
+          top: 4px;
           border-radius: 2px;
           cursor: not-allowed;
           position: relative;
@@ -2312,8 +2354,60 @@ export default {
               right: 7px;
             }
           }
-        }
+        } 
       }
+  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+      .bgColorS {
+        display: inline-block;
+        width: 55px;
+        height: 30px;
+        // background: #666666;
+        // line-height: 30px;
+        // text-align: center;
+        position: relative;
+        top: 5px;
+        left: -4px;
+      .changesOver {
+                  width: 54px;
+                  background: rgb(235, 235, 228);
+                  height: 30px;
+                  line-height: 30px;
+                  border: 0.5px solid rgb(210, 210, 210);
+                  position: relative;
+                  text-indent: 10px;
+                  top: 3px;
+                  border-radius: 2px;
+                  cursor: not-allowed;
+                  position: relative;
+                  div {
+                    width: 23px;
+                    height: 20px;
+                    margin-top: 5px;
+                    margin-left: 7px;
+                    img {
+                      top: 14px;
+                      position: absolute;
+                      right: 7px;
+                    }
+                  }
+                }
+      }
+              
+         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
     @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
       .Water_font.changesOver {
